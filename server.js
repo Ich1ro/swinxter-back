@@ -27,7 +27,8 @@ var corsOptions = {
     "https://hot-date.vercel.app",
     "https://swinxter-v2.vercel.app",
     "https://swinxter-admin.vercel.app",
-    "https://www.swinxter.com"
+    "https://www.swinxter.com",
+    "https://swinxter-front.vercel.app"
   ],
   credentials: true,
 };

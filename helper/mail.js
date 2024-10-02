@@ -2,23 +2,23 @@ const nodemailer = require("nodemailer");
 
 const Mailsend = (req, res, data) => {
   // Create a transporter object with your SMTP server configuration
-  const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-      user: process.env.Nodemailer_id,
-      pass: process.env.Nodemailer_pass,
-    },
-  });
-
   // const transporter = nodemailer.createTransport({
-  //   host: "mail.seoraft.com",
-  //   port: 465,
-  //   secure: true,
+  //   service: "Gmail",
   //   auth: {
   //     user: process.env.Nodemailer_id,
   //     pass: process.env.Nodemailer_pass,
   //   },
   // });
+
+  const transporter = nodemailer.createTransport({
+    host: "mail.swinxter.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.Nodemailer_id,
+      pass: process.env.Nodemailer_pass,
+    },
+  });
 
   var mailOptions = data;
 

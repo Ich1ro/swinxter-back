@@ -128,50 +128,58 @@ module.exports = {
     }
   },
   async login(req, res) {
-    const { email, password } = req.body;
-    const serverClient = StreamChat.getInstance(process.env.STREAM_API_KEY,process.env.STREAM_API_SECRET);
+    const { identifier, password } = req.body;
+    const serverClient = StreamChat.getInstance(process.env.STREAM_API_KEY, process.env.STREAM_API_SECRET);
     try {
-      if (!email || !password) {
-        return res.status(400).send("Please Provide Required Information");
-      }
-      const exist = await userModel.findOne({ email });
-      if (!exist) {
-        return res.status(400).send("User doesn't exist");
-      }
-      if (exist.isVerify == false) {
-        return res.status(400).send("Email is not verified");
-      }
-      const match = await bcrypt.compare(password, exist.password);
-      if (!match) {
-        return res.status(400).send("Your password is wrong");
-      } else {
-        const token = jwt.sign(
-          { _id: exist._id, email: exist.email, role: exist.role },
-          SECRET_KEY,
-          {
-            expiresIn: "10d",
-          },
-        );
-        const stream_id = exist._id.toString();
-        const stream_token = serverClient.createToken(stream_id);
-        exist.stream_token = stream_token;
-        exist.isLogged = true;
-        await exist.save();
-        const options = {
-          expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-          httpOnly: true,
-          sameSite: "none",
-          secure: true,
-        };
-        return res
-          .status(200)
-          .cookie("token", token, options)
-          .send({ data: exist, token: token });
-      }
+        if (!identifier || !password) {
+            return res.status(400).send("Please provide the required information");
+        }
+
+        const isEmail = identifier.includes("@");
+
+        const exist = isEmail
+            ? await userModel.findOne({ email: identifier })
+            : await userModel.findOne({ username: identifier });
+
+        if (!exist) {
+            return res.status(400).send("User doesn't exist");
+        }
+        if (!exist.isVerify) {
+            return res.status(400).send("Email is not verified");
+        }
+
+        const match = await bcrypt.compare(password, exist.password);
+        if (!match) {
+            return res.status(400).send("Your password is wrong");
+        } else {
+            const token = jwt.sign(
+                { _id: exist._id, email: exist.email, role: exist.role },
+                SECRET_KEY,
+                {
+                    expiresIn: "10d",
+                }
+            );
+            const stream_id = exist._id.toString();
+            const stream_token = serverClient.createToken(stream_id);
+            exist.stream_token = stream_token;
+            exist.isLogged = true;
+            await exist.save();
+            const options = {
+                expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+            };
+            return res
+                .status(200)
+                .cookie("token", token, options)
+                .send({ data: exist, token: token });
+        }
     } catch (error) {
-      return res.status(400).send(error);
+        return res.status(400).send(error);
     }
-  },
+},
+
   async login4(req, res) {
     const { email, password } = req.body;
     const serverClient = StreamChat.getInstance(process.env.STREAM_API_KEY,process.env.STREAM_API_SECRET);

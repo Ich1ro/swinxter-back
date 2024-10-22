@@ -61,6 +61,7 @@ router.post("/logout/:id", user.logout);
 router.put("/changePassword", verifyToken, user.changePassword);
 router.post("/contactUs", user.contactUs);
 router.get("/userdetail/:id", user.userdetail);
+router.get("/userverify/:id", user.userverify);
 router.post("/subscribe/:modelId", verifyUser, user.subscribe);
 router.put(
   "/upload_image/:userId",

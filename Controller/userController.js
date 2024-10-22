@@ -611,6 +611,20 @@ module.exports = {
       return res.status(500).send(e);
     }
   },
+  async userverify(req, res) {
+    try {
+      const { id } = req.params;
+      const data = await userModel.findById({ _id: id });
+      if (!data) {
+        return res.status(400).send("something went wrong");
+      } else {
+        return res.status(200).send(data.isVerify);
+      }
+    } catch (e) {
+      console.log(e);
+      return res.status(500).send(e);
+    }
+  },
   async contactUs(req, res) {
     try {
       const { username, email, reason, message } = req.body;

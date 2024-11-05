@@ -1269,14 +1269,11 @@ module.exports = {
       const orderid = `${userId}-${Date.now()}`
       const postData = new URLSearchParams({
 				security_key: '3CwAU9WRDuWYAz3gDTgKDjmv2rYe98Qj',
-				action_type: 'sale',
+				type: 'sale',
 				ccnumber: ccnumber,
 				ccexp: `${expmm.toString().padStart(2, '0')}${expyy.toString().slice(-2)}`,
 				cvv: cvv,
 				amount: amount,
-				currency: 'USD',
-        orderid: orderid,
-        dup_seconds: 1
 			});
 
       try {

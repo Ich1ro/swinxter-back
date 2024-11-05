@@ -1276,7 +1276,7 @@ module.exports = {
 				amount: amount,
 				currency: 'USD',
         orderid: orderid,
-        dup_seconds: 0
+        dup_seconds: 1
 			});
 
       try {

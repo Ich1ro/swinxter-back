@@ -1248,7 +1248,7 @@ module.exports = {
     return res.status(200).send("Emails sent successfully");
   },
   async add_subscription (req,res) {
-    const {ccnumber, expmm, expyy, userId, amount, month_freq, day_of_month} = req.body;
+    const {ccnumber, expmm, expyy, cvv, userId, amount, month_freq, day_of_month} = req.body;
     const expiry = `${expmm}${expyy?.slice(-2)}`;
 
     const today = new Date();
@@ -1266,32 +1266,26 @@ module.exports = {
       return res.status(404).send("User not found");
     }
     else{
-      const encodedParams = new URLSearchParams();
-      encodedParams.set('recurring', 'add_subscription');
-      encodedParams.set('ccnumber', ccnumber);
-      encodedParams.set('security_key', '6457Thfj624V5r7WUwc5v6a68Zsd6YEm');
-      encodedParams.set('payment', 'creditcard');
-      encodedParams.set('plan_payments', '0');
-      encodedParams.set('plan_amount', amount);
-      encodedParams.set('month_frequency', month_freq);
-      encodedParams.set('day_of_month', today_date);
-      encodedParams.set('start_date', formattedDate);
-      encodedParams.set('ccexp', expiry);
-      encodedParams.set('first_name', existingUser.username);
-      encodedParams.set('email', existingUser.email);
-      encodedParams.set('customer_receipt', 'true');
-      const options = {
-        method: 'POST',
-        url: 'https://secure.nmi.com/api/transact.php',
-        headers: {
-          accept: 'application/x-www-form-urlencoded',
-          'content-type': 'application/x-www-form-urlencoded'
-        },
-        data: encodedParams,
-      };
+      const postData = new URLSearchParams({
+				security_key: '3CwAU9WRDuWYAz3gDTgKDjmv2rYe98Qj',
+				action_type: 'sale',
+				ccnumber: ccnumber,
+				ccexp: `${expmm.toString().padStart(2, '0')}${expyy.toString().slice(-2)}`,
+				cvv: cvv,
+				amount: amount,
+				currency: 'USD',
+			});
 
       try {
-        const response = await axios.request(options);
+        const response = await axios.post(
+          'https://ick.transactiongateway.com/api/query.php',
+          postData,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        );
         const newToday = new Date();
         const futureDate = new Date(newToday.getFullYear(), newToday.getMonth() + Number(month_freq), newToday.getDate());    
         existingUser.payment.membership = true;

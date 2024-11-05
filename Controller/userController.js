@@ -1266,6 +1266,7 @@ module.exports = {
       return res.status(404).send("User not found");
     }
     else{
+      const orderid = `${userId}-${Date.now()}`
       const postData = new URLSearchParams({
 				security_key: '3CwAU9WRDuWYAz3gDTgKDjmv2rYe98Qj',
 				action_type: 'sale',
@@ -1274,6 +1275,7 @@ module.exports = {
 				cvv: cvv,
 				amount: amount,
 				currency: 'USD',
+        orderid: orderid
 			});
 
       try {

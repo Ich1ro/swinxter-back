@@ -1267,7 +1267,6 @@ module.exports = {
     }
     else{
       const orderid = `${userId}-${Date.now()}`
-      const transactionid = `${userId}-${Date.now()}`
       const postData = new URLSearchParams({
 				security_key: '3CwAU9WRDuWYAz3gDTgKDjmv2rYe98Qj',
 				action_type: 'sale',
@@ -1277,7 +1276,6 @@ module.exports = {
 				amount: amount,
 				currency: 'USD',
         orderid: orderid,
-        transactionid: transactionid
 			});
 
       try {

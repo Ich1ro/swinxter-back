@@ -1286,6 +1286,8 @@ module.exports = {
             },
           }
         );
+        console.log(response);
+        
         const newToday = new Date();
         const futureDate = new Date(newToday.getFullYear(), newToday.getMonth() + Number(month_freq), newToday.getDate());    
         existingUser.payment.membership = true;
@@ -1294,7 +1296,7 @@ module.exports = {
         existingUser.payment.membership_expiry = futureDate;
         existingUser.payment.membership_price = amount;
         existingUser.save();
-        return res.status(200).send(response.data);
+        return res.status(200).send(response);
       } catch (error) {
         return res.status(500).send(error.message);
       }

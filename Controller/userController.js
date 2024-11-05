@@ -1278,7 +1278,7 @@ module.exports = {
 
       try {
         const response = await axios.post(
-          'https://ick.transactiongateway.com/api/query.php',
+          'https://ick.transactiongateway.com/api/transact.php',
           postData,
           {
             headers: {

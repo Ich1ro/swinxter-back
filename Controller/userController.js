@@ -1294,7 +1294,7 @@ module.exports = {
         existingUser.payment.membership_expiry = futureDate;
         existingUser.payment.membership_price = amount;
         existingUser.save();
-        const lastThree = dataString.slice(-3);
+        const lastThree = response.data.slice(-3);
         return res.status(200).send(+lastThree);
       } catch (error) {
         return res.status(500).send(error.message);

@@ -1162,57 +1162,44 @@ module.exports = {
 	async advancedSearch(req, res) {
 		try {
 			const filters = req.body;
-			const { profileType, single, person1, person2 } = filters;
+			const { accountType, single, person1, person2 } = filters;
 
 			const query = {};
 
-			const buildPersonFilters = personFilters => {
-				const personQuery = {};
+			if (accountType === 'single') {
+				query.profile_type = 'single';
 
-				if (personFilters.gender) personQuery.gender = personFilters.gender;
+				if (single.gender) {
+					query.gender = single.gender;
+				}
 
-				if (personFilters.ageRange && personFilters.ageRange.length === 2) {
-					const [minAge, maxAge] = personFilters.ageRange;
+				if (single.ageRange && single.ageRange.length === 2) {
+					const [minAge, maxAge] = single.ageRange;
 					const minDOB = new Date(
 						new Date().setFullYear(new Date().getFullYear() - maxAge)
 					);
 					const maxDOB = new Date(
 						new Date().setFullYear(new Date().getFullYear() - minAge)
 					);
-					personQuery.DOB = { $gte: minDOB, $lte: maxDOB };
+					query.DOB = { $gte: minDOB, $lte: maxDOB };
 				}
 
-				if (personFilters.interests && personFilters.interests.length > 0) {
-					personQuery.interests = { $in: personFilters.interests };
+				if (single.interests && single.interests.length > 0) {
+					query['interests.male'] = { $in: single.interests };
 				}
-
-				if (personFilters.smoking) personQuery.smoking = personFilters.smoking;
-				if (personFilters.drinking)
-					personQuery.Drinking = personFilters.drinking;
-				if (personFilters.bodyType && personFilters.bodyType.length > 0) {
-					personQuery.body_type = { $in: personFilters.bodyType };
+				if (single.smoking) query.smoking = single.smoking;
+				if (single.drinking) query.drinking = single.drinking;
+				if (single.bodyType && single.bodyType.length > 0) {
+					query.body_type = { $in: single.bodyType };
 				}
-
-				return personQuery;
-			};
-
-			if (profileType === 'single') {
-				query.$and = [buildPersonFilters(single)];
-			} else if (profileType === 'couple') {
+			} else if (accountType === 'couple') {
 				const coupleQuery = [];
 
-				if (person1 && person1.gender) {
-					const person1Filters = buildPersonFilters(person1);
-					coupleQuery.push({
-						'couple.person1': { $elemMatch: person1Filters },
-					});
+				if (person1.gender) {
+					coupleQuery.push({ 'couple.person1.gender': person1.gender });
 				}
-
-				if (person2 && person2.gender) {
-					const person2Filters = buildPersonFilters(person2);
-					coupleQuery.push({
-						'couple.person2': { $elemMatch: person2Filters },
-					});
+				if (person2.gender) {
+					coupleQuery.push({ 'couple.person2.gender': person2.gender });
 				}
 
 				if (coupleQuery.length > 0) {
@@ -1221,7 +1208,6 @@ module.exports = {
 			}
 
 			const users = await userModel.find(query);
-
 			res.status(200).json(users);
 		} catch (error) {
 			console.error(error);

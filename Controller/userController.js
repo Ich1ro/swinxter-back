@@ -1159,6 +1159,76 @@ module.exports = {
 			return res.status(500).send(e);
 		}
 	},
+	async advancedSearch(req, res) {
+		try {
+			const filters = req.body;
+			const { profileType, single, person1, person2 } = filters;
+
+			const query = {};
+
+			const buildPersonFilters = personFilters => {
+				const personQuery = {};
+
+				if (personFilters.gender) personQuery.gender = personFilters.gender;
+
+				if (personFilters.ageRange && personFilters.ageRange.length === 2) {
+					const [minAge, maxAge] = personFilters.ageRange;
+					const minDOB = new Date(
+						new Date().setFullYear(new Date().getFullYear() - maxAge)
+					);
+					const maxDOB = new Date(
+						new Date().setFullYear(new Date().getFullYear() - minAge)
+					);
+					personQuery.DOB = { $gte: minDOB, $lte: maxDOB };
+				}
+
+				if (personFilters.interests && personFilters.interests.length > 0) {
+					personQuery.interests = { $in: personFilters.interests };
+				}
+
+				if (personFilters.smoking) personQuery.smoking = personFilters.smoking;
+				if (personFilters.drinking)
+					personQuery.Drinking = personFilters.drinking;
+				if (personFilters.bodyType && personFilters.bodyType.length > 0) {
+					personQuery.body_type = { $in: personFilters.bodyType };
+				}
+
+				return personQuery;
+			};
+
+			if (profileType === 'single') {
+				query.$and = [buildPersonFilters(single)];
+			} else if (profileType === 'couple') {
+				const coupleQuery = [];
+
+				if (person1 && person1.gender) {
+					const person1Filters = buildPersonFilters(person1);
+					coupleQuery.push({
+						'couple.person1': { $elemMatch: person1Filters },
+					});
+				}
+
+				if (person2 && person2.gender) {
+					const person2Filters = buildPersonFilters(person2);
+					coupleQuery.push({
+						'couple.person2': { $elemMatch: person2Filters },
+					});
+				}
+
+				if (coupleQuery.length > 0) {
+					query.$or = coupleQuery;
+				}
+			}
+
+			const users = await userModel.find(query);
+
+			res.status(200).json(users);
+		} catch (error) {
+			console.error(error);
+			res.status(500).json({ message: 'error' });
+		}
+	},
+
 	async unblockUser(req, res) {
 		const userId = req.body.userId;
 		const blockId = req.body.blockId;
@@ -1211,9 +1281,7 @@ module.exports = {
 			const user = await userModel.findById({ _id: recieverId });
 			user.notifications.push(ObjId);
 			user.save();
-			// await user.updateOne({_id:recieverId}, {
-			//   $push:{notifications: ObjId}
-			// });
+
 			return res.status(200).send('Notification sent');
 		} catch (e) {
 			console.log(e);

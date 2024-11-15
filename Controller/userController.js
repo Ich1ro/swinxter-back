@@ -1193,22 +1193,73 @@ module.exports = {
 					query.body_type = { $in: single.bodyType };
 				}
 			} else if (accountType === 'couple') {
-				const coupleQuery = [];
-
-				if (person1.gender) {
-					coupleQuery.push({ 'couple.person1.gender': person1.gender });
+				query.profile_type = 'couple';
+	
+				const orConditions = [];
+	
+				if (person1.gender && person2.gender) {
+					orConditions.push(
+						{
+							'couple.person1.gender': person1.gender,
+							'couple.person2.gender': person2.gender,
+						},
+						{
+							'couple.person1.gender': person2.gender,
+							'couple.person2.gender': person1.gender,
+						}
+					);
 				}
-				if (person2.gender) {
-					coupleQuery.push({ 'couple.person2.gender': person2.gender });
+	
+				query.$or = orConditions;
+	
+				const person1Filters = {};
+				if (person1.bodyType && person1.bodyType.length > 0) {
+					person1Filters.body_type = { $in: person1.bodyType };
 				}
-
-				if (coupleQuery.length > 0) {
-					query.$or = coupleQuery;
+				if (person1.smoking) person1Filters.smoking = person1.smoking;
+				if (person1.drinking) person1Filters.drinking = person1.drinking;
+				if (person1.ageRange && person1.ageRange.length === 2) {
+					const [minAge, maxAge] = person1.ageRange;
+					const minDOB = new Date(
+						new Date().setFullYear(new Date().getFullYear() - maxAge)
+					);
+					const maxDOB = new Date(
+						new Date().setFullYear(new Date().getFullYear() - minAge)
+					);
+					person1Filters.DOB = { $gte: minDOB, $lte: maxDOB };
 				}
+	
+				const person2Filters = {};
+				if (person2.bodyType && person2.bodyType.length > 0) {
+					person2Filters.body_type = { $in: person2.bodyType };
+				}
+				if (person2.smoking) person2Filters.smoking = person2.smoking;
+				if (person2.drinking) person2Filters.drinking = person2.drinking;
+				if (person2.ageRange && person2.ageRange.length === 2) {
+					const [minAge, maxAge] = person2.ageRange;
+					const minDOB = new Date(
+						new Date().setFullYear(new Date().getFullYear() - maxAge)
+					);
+					const maxDOB = new Date(
+						new Date().setFullYear(new Date().getFullYear() - minAge)
+					);
+					person2Filters.DOB = { $gte: minDOB, $lte: maxDOB };
+				}
+	
+				query.$and = [
+					{
+						$or: [
+							{ 'couple.person1': { $elemMatch: person1Filters } },
+							{ 'couple.person2': { $elemMatch: person2Filters } },
+						],
+					},
+				];
 			}
-
+	
 			const users = await userModel.find(query);
+	
 			res.status(200).json(users);
+	
 		} catch (error) {
 			console.error(error);
 			res.status(500).json({ message: 'error' });

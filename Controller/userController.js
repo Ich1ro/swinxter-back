@@ -1210,7 +1210,8 @@ module.exports = {
 					query['couple.person1.body_type'] = { $in: person1.bodyType };
 				}
 				if (person1.smoking) query['couple.person1.smoking'] = person1.smoking;
-				if (person1.drinking) query['couple.person1.drinking'] = person1.drinking;
+				if (person1.drinking) query['couple.person1.Drinking'] = person2.drinking;
+				if (person1.drugs) query['couple.person1.Drugs'] = person2.drinking;
 				if (person1.ageRange && person1.ageRange.length === 2) {
 					const [minAge, maxAge] = person1.ageRange;
 					const minDOB = new Date(
@@ -1226,7 +1227,8 @@ module.exports = {
 					query['couple.person2.body_type'] = { $in: person2.bodyType };
 				}
 				if (person2.smoking) query['couple.person2.smoking'] = person2.smoking;
-				if (person2.drinking) query['couple.person2.drinking'] = person2.drinking;
+				if (person2.drinking) query['couple.person2.Drinking'] = person2.drinking;
+				if (person2.drugs) query['couple.person2.Drugs'] = person2.drinking;
 				if (person2.ageRange && person2.ageRange.length === 2) {
 					const [minAge, maxAge] = person2.ageRange;
 					const minDOB = new Date(

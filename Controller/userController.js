@@ -314,7 +314,8 @@ module.exports = {
 				if(exist.image) {
 					await S3Manager.delete(exist.image);
 				}
-				image = await S3Manager.put('users', req.files)
+				const file = req.files.image[0]; 
+				image = await S3Manager.put('users', file)
 				// image = `${process.env.Backend_URL_Image}${req.files.image[0].filename}`;
 			} else {
 				image = '';

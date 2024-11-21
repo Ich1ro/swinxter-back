@@ -18,6 +18,7 @@ const StreamChat = require('stream-chat').StreamChat;
 const { generateToken04 } = require('../zego_server/zegoServerAssistant');
 const axios = require('axios');
 const { URLSearchParams } = require('url');
+const { S3Manager } = require('../utils/s3')
 
 module.exports = {
 	async signup(req, res) {
@@ -310,7 +311,11 @@ module.exports = {
 			let image = '';
 			console.log(req.files);
 			if (req.files) {
-				image = `${process.env.Backend_URL_Image}${req.files.image[0].filename}`;
+				if(exist.image) {
+					await S3Manager.delete(exist.image);
+				}
+				image = await S3Manager.put('users', req.files)
+				// image = `${process.env.Backend_URL_Image}${req.files.image[0].filename}`;
 			} else {
 				image = '';
 			}

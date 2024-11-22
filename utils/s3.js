@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3")
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, ObjectCannedACL } = require("@aws-sdk/client-s3")
 const { v4 } = require('uuid')
 const path = require('path')
 // const { Logger } = require("./logger")
@@ -91,7 +91,8 @@ exports.S3Manager = class S3 {
             await this.instance().send(new PutObjectCommand({
                 Bucket: process.env.S3_BUCKET,
                 Key: newImgKey,
-                Body: file.buffer
+                Body: file.buffer,
+				ACL: ObjectCannedACL.public_read
             }))
 
             return newImgKey

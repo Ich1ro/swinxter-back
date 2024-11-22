@@ -92,7 +92,7 @@ exports.S3Manager = class S3 {
                 Bucket: process.env.S3_BUCKET,
                 Key: newImgKey,
                 Body: file.buffer,
-				ContentType: 'image/jpeg',
+				ContentType: file.mimetype,
 				ACL: ObjectCannedACL.public_read
             }))
 

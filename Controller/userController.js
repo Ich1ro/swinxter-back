@@ -316,7 +316,7 @@ module.exports = {
 				}
 				const file = req.files.image[0]; 
 				const imageUrl = await S3Manager.put('users', file)
-				image = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`
+				image = await S3Manager.img(imageUrl, true)?.img
 				// image = `${process.env.Backend_URL_Image}${req.files.image[0].filename}`;
 			} else {
 				image = '';

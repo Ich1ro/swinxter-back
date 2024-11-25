@@ -397,7 +397,7 @@ module.exports = {
 	
 			const imageInfo = {
 				image: image,
-				info: req.body.info,
+				description: req.body.description,
 			};
 	
 			const updatedUser = await userModel.findByIdAndUpdate(

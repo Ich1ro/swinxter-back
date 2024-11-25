@@ -1,5 +1,6 @@
 const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, ObjectCannedACL } = require("@aws-sdk/client-s3")
 const { v4 } = require('uuid')
+const fs = require('fs').promises;
 const path = require('path')
 // const { Logger } = require("./logger")
 
@@ -87,11 +88,12 @@ exports.S3Manager = class S3 {
 
     static async put(folder, file) {
         try {
+            const fileBuffer = await fs.readFile(file.path);
             const newImgKey = folder + '/' + v4() + path.extname(file.originalname).toLowerCase()
             await this.instance().send(new PutObjectCommand({
                 Bucket: process.env.S3_BUCKET,
                 Key: newImgKey,
-                Body: file.buffer,
+                Body: fileBuffer,
 				ContentType: file.mimetype,
 				ACL: ObjectCannedACL.public_read
             }))

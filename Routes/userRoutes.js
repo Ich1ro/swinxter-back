@@ -72,6 +72,24 @@ router.put(
   ]),
   user.upload_image,
 );
+router.put(
+  "/upload_media/:userId",
+  upload.fields([
+    { name: "images", maxCount: 1000 * 100 * 10 },
+    { name: "image", maxCount: 1 },
+    { name: "videos", maxCount: 1000 * 100 * 10 },
+  ]),
+  user.upload_media,
+);
+router.put(
+  "/delete_media/:userId",
+  upload.fields([
+    { name: "images", maxCount: 1000 * 100 * 10 },
+    { name: "image", maxCount: 1 },
+    { name: "videos", maxCount: 1000 * 100 * 10 },
+  ]),
+  user.delete_media,
+);
 
 router.post("/addwallet/:id", verifyUser, user.addwallet);
 router.get("/getfavModel/:userId", user.getfavModel);

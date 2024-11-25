@@ -1,4 +1,12 @@
 const {mongoose,Schema} = require("mongoose");
+
+const MediaSchema = new Schema({
+  image: { type: String, required: true },
+  description: { type: String },
+  uploadedAt: { type: Date, default: Date.now },
+});
+
+
 const UserSchema = new mongoose.Schema(
   {
     profile_type: {
@@ -81,7 +89,7 @@ const UserSchema = new mongoose.Schema(
     followers: [{ type: String }],
     paymentUser: { type: String },
     album: [{type: String }],
-    mymedia: {type: Array},
+    mymedia: [MediaSchema],
     images: [{ type: String }],
     videos: [{ type: String }],
     isLive: { type: Boolean, default: false },

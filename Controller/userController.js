@@ -18,7 +18,8 @@ const StreamChat = require('stream-chat').StreamChat;
 const { generateToken04 } = require('../zego_server/zegoServerAssistant');
 const axios = require('axios');
 const { URLSearchParams } = require('url');
-const { S3Manager } = require('../utils/s3')
+const { S3Manager } = require('../utils/s3');
+const { info } = require('console');
 
 module.exports = {
 	async signup(req, res) {
@@ -311,13 +312,13 @@ module.exports = {
 			let image = '';
 			console.log(req.files);
 			if (req.files) {
-				if(exist.image) {
+				if (exist.image) {
 					await S3Manager.delete(exist.image);
 				}
-				const file = req.files.image[0]; 
-				const imageUrl = await S3Manager.put('users', file)
-				
-				image = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`
+				const file = req.files.image[0];
+				const imageUrl = await S3Manager.put('users', file);
+
+				image = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
 				// image = `${process.env.Backend_URL_Image}${req.files.image[0].filename}`;
 			} else {
 				image = '';
@@ -349,9 +350,18 @@ module.exports = {
 				{ new: true }
 			);
 			if (image.length > 0) {
-				const user = await userModel.findById({ _id: exist._id });
-				user.mymedia.push(image);
-				user.save();
+				const imageInfo = {
+					image: image,
+					info: '',
+				};
+				await userModel.findByIdAndUpdate(
+					userId,
+					{ $push: { mymedia: imageInfo } },
+					{ new: true }
+				);
+				// const user = await userModel.findById({ _id: exist._id });
+				// user.mymedia.push(image);
+				// await user.save();
 			}
 			console.log(data);
 			if (!data) {
@@ -363,6 +373,85 @@ module.exports = {
 			return res.status(500).send(error);
 		}
 	},
+	async upload_media(req, res) {
+		const { userId } = req.params;
+	
+		try {
+			if (!userId) {
+				return res.status(400).send('userId is required');
+			}
+
+			const exist = await userModel.findOne({ _id: userId });
+			if (!exist) {
+				return res.status(404).send("User doesn't exist");
+			}
+	
+			if (!req.files || !req.files.image || req.files.image.length === 0) {
+				return res.status(400).send('Image file is required');
+			}
+	
+			const file = req.files.image[0];
+	
+			const imageUrl = await S3Manager.put('users', file);
+			const image = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
+	
+			const imageInfo = {
+				image: image,
+				info: req.body.info,
+			};
+	
+			const updatedUser = await userModel.findByIdAndUpdate(
+				userId,
+				{ $push: { mymedia: imageInfo } },
+				{ new: true }
+			);
+	
+			if (!updatedUser) {
+				return res.status(400).send('Failed to Upload Image');
+			}
+	
+			return res.status(200).send(updatedUser);
+		} catch (error) {
+			console.error(error);
+			return res.status(500).send(error.message);
+		}
+	},
+	async delete_media(req, res) {
+		const { userId } = req.params;
+		const { mediaId } = req.body;
+	
+		try {
+			if (!userId) {
+				return res.status(400).send('userId is required');
+			}
+	
+			const user = await userModel.findById(userId);
+			if (!user) {
+				return res.status(404).send("User doesn't exist");
+			}
+
+			const mediaIndex = user.mymedia.findIndex((media) => media._id.toString() === mediaId);
+			if (mediaIndex === -1) {
+				return res.status(404).send("Media doesn't exist");
+			}
+
+			const media = user.mymedia[mediaIndex];
+			const s3Key = media.image.split('.amazonaws.com/')[1];
+	
+			await S3Manager.delete(s3Key);
+
+			user.mymedia.splice(mediaIndex, 1);
+	
+			await user.save();
+	
+			return res.status(200).send({ message: 'Media deleted successfully' });
+		} catch (error) {
+			console.error(error);
+			return res.status(500).send(error.message);
+		}
+	},
+	
+	
 
 	async update(req, res) {
 		try {
@@ -1202,7 +1291,7 @@ module.exports = {
 				}
 			} else if (accountType === 'couple') {
 				query.profile_type = 'couple';
-	
+
 				query.$or = [
 					{
 						'couple.person1.gender': 'female',
@@ -1213,12 +1302,13 @@ module.exports = {
 						'couple.person2.gender': 'female',
 					},
 				];
-	
+
 				if (person1.bodyType && person1.bodyType.length > 0) {
 					query['couple.person1.body_type'] = { $in: person1.bodyType };
 				}
 				if (person1.smoking) query['couple.person1.smoking'] = person1.smoking;
-				if (person1.drinking) query['couple.person1.Drinking'] = person2.drinking;
+				if (person1.drinking)
+					query['couple.person1.Drinking'] = person2.drinking;
 				if (person1.drugs) query['couple.person1.Drugs'] = person2.drinking;
 				if (person1.ageRange && person1.ageRange.length === 2) {
 					const [minAge, maxAge] = person1.ageRange;
@@ -1230,12 +1320,13 @@ module.exports = {
 					);
 					query['couple.person1.DOB'] = { $gte: minDOB, $lte: maxDOB };
 				}
-	
+
 				if (person2.bodyType && person2.bodyType.length > 0) {
 					query['couple.person2.body_type'] = { $in: person2.bodyType };
 				}
 				if (person2.smoking) query['couple.person2.smoking'] = person2.smoking;
-				if (person2.drinking) query['couple.person2.Drinking'] = person2.drinking;
+				if (person2.drinking)
+					query['couple.person2.Drinking'] = person2.drinking;
 				if (person2.drugs) query['couple.person2.Drugs'] = person2.drinking;
 				if (person2.ageRange && person2.ageRange.length === 2) {
 					const [minAge, maxAge] = person2.ageRange;
@@ -1248,7 +1339,7 @@ module.exports = {
 					query['couple.person2.DOB'] = { $gte: minDOB, $lte: maxDOB };
 				}
 			}
-	
+
 			const users = await userModel.find(query);
 			res.status(200).json(users);
 		} catch (error) {

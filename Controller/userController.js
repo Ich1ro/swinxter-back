@@ -375,7 +375,7 @@ module.exports = {
 	},
 	async upload_media(req, res) {
 		const { userId } = req.params;
-	
+
 		try {
 			if (!userId) {
 				return res.status(400).send('userId is required');
@@ -385,32 +385,46 @@ module.exports = {
 			if (!exist) {
 				return res.status(404).send("User doesn't exist");
 			}
-	
+
 			if (!req.files || !req.files.image || req.files.image.length === 0) {
 				return res.status(400).send('Image file is required');
 			}
-	
+
 			const file = req.files.image[0];
-	
+
 			const imageUrl = await S3Manager.put('users', file);
 			const image = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
-	
+
 			const imageInfo = {
 				image: image,
 				description: req.body.description,
-				isPublic: req.body.isPublic || true
+				isPublic: req.body.isPublic || true,
 			};
-	
+
+			const password = req?.body?.privatePassword;
+
+			const updatedData = {
+				$push: { mymedia: imageInfo },
+			};
+
+			if (password) {
+				const newPassword = await bcrypt.hash(password, 10);
+				updatedData.$set = {
+					...updatedData.$set,
+					privatePassword: newPassword,
+				};
+			}
+
 			const updatedUser = await userModel.findByIdAndUpdate(
 				userId,
-				{ $push: { mymedia: imageInfo } },
+				updatedData,
 				{ new: true }
 			);
-	
+
 			if (!updatedUser) {
 				return res.status(400).send('Failed to Upload Image');
 			}
-	
+
 			return res.status(200).send(updatedUser);
 		} catch (error) {
 			console.error(error);
@@ -420,39 +434,39 @@ module.exports = {
 	async delete_media(req, res) {
 		const { userId } = req.params;
 		const { mediaId } = req.body;
-	
+
 		try {
 			if (!userId) {
 				return res.status(400).send('userId is required');
 			}
-	
+
 			const user = await userModel.findById(userId);
 			if (!user) {
 				return res.status(404).send("User doesn't exist");
 			}
 
-			const mediaIndex = user.mymedia.findIndex((media) => media._id.toString() === mediaId);
+			const mediaIndex = user.mymedia.findIndex(
+				media => media._id.toString() === mediaId
+			);
 			if (mediaIndex === -1) {
 				return res.status(404).send("Media doesn't exist");
 			}
 
 			const media = user.mymedia[mediaIndex];
 			const s3Key = media.image.split('.amazonaws.com/')[1];
-	
+
 			await S3Manager.delete(s3Key);
 
 			user.mymedia.splice(mediaIndex, 1);
-	
+
 			await user.save();
-	
+
 			return res.status(200).send({ message: 'Media deleted successfully' });
 		} catch (error) {
 			console.error(error);
 			return res.status(500).send(error.message);
 		}
 	},
-	
-	
 
 	async update(req, res) {
 		try {

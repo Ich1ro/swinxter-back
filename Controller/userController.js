@@ -398,6 +398,7 @@ module.exports = {
 			const imageInfo = {
 				image: image,
 				description: req.body.description,
+				isPublic: req.body.isPublic || true
 			};
 	
 			const updatedUser = await userModel.findByIdAndUpdate(

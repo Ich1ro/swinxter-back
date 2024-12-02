@@ -407,7 +407,7 @@ module.exports = {
 				$push: { mymedia: imageInfo },
 			};
 
-			if (password) {
+			if (newPassword) {
 				// const newPassword = await bcrypt.hash(password, 10);
 				updatedData.$set = {
 					...updatedData.$set,

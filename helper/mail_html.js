@@ -360,34 +360,34 @@ const welcome_user = name => {
        <div style="margin-top: 30px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 0 20px">
          <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>3 Day Package</p>
-           <h1 style="color: orange">Free</h1>
+           <h1 style="color: orange; font-size: 22px">Free</h1>
            <p>All services included</p>
          </div>
          <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>1 Week Package</p>
-           <h1 style="color: orange">$14.99</h1>
+           <h1 style="color: orange; font-size: 22px">$14.99</h1>
            <p>All services included</p>
          </div>
          <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>1 Month Package</p>
-           <h1 style="color: orange">$24.99</h1>
+           <h1 style="color: orange; font-size: 22px">$24.99</h1>
            <p>All services included</p>
          </div>
          </div>
         <div style="margin-top: 30px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 0 20px; margin-bottom: 20px">
          <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>3 Month Package</p>
-           <h1 style="color: orange">$46.99</h1>
+           <h1 style="color: orange; font-size: 22px">$46.99</h1>
            <p>All services included</p>
          </div>
          <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>6 Month Package</p>
-           <h1 style="color: orange">$77.99</h1>
+           <h1 style="color: orange; font-size: 22px">$77.99</h1>
            <p>All services included</p>
          </div>
          <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>9 Month Package</p>
-           <h1 style="color: orange">$119.99</h1>
+           <h1 style="color: orange; font-size: 22px">$119.99</h1>
            <p>All services included</p>
          </div>
         </div>

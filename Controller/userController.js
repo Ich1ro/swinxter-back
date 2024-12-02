@@ -401,14 +401,14 @@ module.exports = {
 				isPublic: req.body.isPublic || true,
 			};
 
-			const password = req?.body?.privatePassword;
+			const newPassword = req?.body?.privatePassword;
 
 			const updatedData = {
 				$push: { mymedia: imageInfo },
 			};
 
 			if (password) {
-				const newPassword = await bcrypt.hash(password, 10);
+				// const newPassword = await bcrypt.hash(password, 10);
 				updatedData.$set = {
 					...updatedData.$set,
 					privatePassword: newPassword,

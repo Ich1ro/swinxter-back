@@ -340,7 +340,7 @@ const welcome_user = (name) => {
      </div>
      <div class="content">
         <div style="line-height: 0.4">
-            <h1 style="text-align: center; font-size: 38px">Welcome to Swinxter</h1>
+            <h1 style="text-align: center; font-size: 38px; margin: 0; line-height: 1">Welcome to Swinxter</h1>
             <p style="color: #999; text-align: center; margin-bottom: 20px">Best adult dating site.</p>
         </div>
          <p>Dear ${name},

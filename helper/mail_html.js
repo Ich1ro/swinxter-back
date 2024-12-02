@@ -1,6 +1,6 @@
 const mailHtml = (data, link, text) => {
-  console.log(data, "=================================");
-  return `
+	console.log(data, '=================================');
+	return `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -76,7 +76,7 @@ const mailHtml = (data, link, text) => {
         </html>`;
 };
 const forgetMail = (name, OTP) => {
-  return `
+	return `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -141,7 +141,7 @@ const forgetMail = (name, OTP) => {
               </div>`;
 };
 const change_passMail = (title, name, text) => {
-  return `<!DOCTYPE html>
+	return `<!DOCTYPE html>
  <html lang="en">
  <head>
      <meta charset="UTF-8">
@@ -202,8 +202,8 @@ const change_passMail = (title, name, text) => {
          </div>
          `;
 };
-const payment_reminder = (name) => {
-  return `<!DOCTYPE html>
+const payment_reminder = name => {
+	return `<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -282,8 +282,8 @@ const payment_reminder = (name) => {
       </div>
          `;
 };
-const welcome_user = (name) => {
-  return `<!DOCTYPE html>
+const welcome_user = name => {
+	return `<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -354,38 +354,38 @@ const welcome_user = (name) => {
          </ul>
          <p>To give you a quick overview, here are the membership plans we offer mentioned below:</p>
      </div>
-     <div style="width: 100%; background-color:#000; color: #fff;padding: 20px 0">
+     <div style="width: 100%; gap: 20px; background-color:#000; color: #fff;padding: 20px 0">
        <h2 style="text-align: center">Membership Plans</h2> 
        <p style="text-align:center">Check out all our membership plans available.</p>
-       <div style="margin-top: 30px; display: flex; justify-content: space-between; padding: 0 20px; margin-bottom: 20px">
-         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center; margin-right: 40px; margin-left: 40px">
+       <div style="margin-top: 30px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 0 20px">
+         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>3 Day Package</p>
            <h1 style="color: orange">Free</h1>
            <p>All services included</p>
          </div>
-         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center; margin-right: 40px">
+         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>1 Week Package</p>
            <h1 style="color: orange">$14.99</h1>
            <p>All services included</p>
          </div>
-         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center; margin-right: 40px">
+         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>1 Month Package</p>
            <h1 style="color: orange">$24.99</h1>
            <p>All services included</p>
          </div>
          </div>
-        <div style="margin-top: 30px; display: flex; justify-content: space-between; padding: 0 20px; margin-bottom: 20px">
-         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center; margin-top: 20px; margin-right: 40px; margin-left: 40px">
+        <div style="margin-top: 30px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 0 20px; margin-bottom: 20px">
+         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>3 Month Package</p>
            <h1 style="color: orange">$46.99</h1>
            <p>All services included</p>
          </div>
-         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center; margin-top: 20px; margin-right: 40px">
+         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>6 Month Package</p>
            <h1 style="color: orange">$77.99</h1>
            <p>All services included</p>
          </div>
-         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center; margin-top: 20px; margin-right: 40px">
+         <div style="background-color: #2A2D37; border-radius: 10px; padding: 10px; text-align:center">
            <p>9 Month Package</p>
            <h1 style="color: orange">$119.99</h1>
            <p>All services included</p>
@@ -414,9 +414,9 @@ const welcome_user = (name) => {
          `;
 };
 module.exports = {
-  mailHtml,
-  forgetMail,
-  change_passMail,
-  welcome_user,
-  payment_reminder
+	mailHtml,
+	forgetMail,
+	change_passMail,
+	welcome_user,
+	payment_reminder,
 };

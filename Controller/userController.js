@@ -56,12 +56,12 @@ module.exports = {
 					let emailHtml = mailHtml(
 						bodyData,
 						verificationLink,
-						`<h4> Thank you for registering on Hot Date App! We're excited to have you join our community.</h4>`
+						`<h4> Thank you for registering on Swinxter! We're excited to have you join our community.</h4>`
 					);
 					let mailOptions = {
 						from: process.env.Nodemailer_id,
 						to: data.email,
-						subject: 'user verify',
+						subject: 'Verify your email',
 						html: emailHtml,
 					};
 					Mailsend(req, res, mailOptions);
@@ -98,12 +98,12 @@ module.exports = {
 					let emailHtml = mailHtml(
 						bodyData,
 						verificationLink,
-						`<h4> Thank you for registering on Hot Date App! We're excited to have you join our community.</h4>`
+						`<h4> Thank you for registering on Swinxter! We're excited to have you join our community.</h4>`
 					);
 					let mailOptions = {
 						from: process.env.Nodemailer_id,
 						to: data.email,
-						subject: 'user verify',
+						subject: 'Verify your email',
 						html: emailHtml,
 					};
 					Mailsend(req, res, mailOptions);

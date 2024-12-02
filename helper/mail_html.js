@@ -52,7 +52,7 @@ const mailHtml = (data, link, text) => {
         <body>
             <div class="container">
             <div class="header">
-            <h1>Welcome to Hot Date App!</h1>
+            <h1>Welcome to Swinxter!</h1>
         </div>
                 <div class="content">
                     <p><h4>Hello ${data.name},</h4></p>
@@ -128,7 +128,7 @@ const forgetMail = (name, OTP) => {
   <body>
       <div class="container">
       <div class="header">
-      <h1>Welcome to Hot Date App!</h1>
+      <h1>Welcome to Swinxter!</h1>
   </div>
           <div class="content">
               <h1>Password Reset OTP</h1>
@@ -192,7 +192,7 @@ const change_passMail = (title, name, text) => {
      <div class="container">
      <div class="header">
      <!-- Check the image source URL and make sure it's correct -->
-     <h1>Welcome to Hot Date App!</h1>
+     <h1>Welcome to Swinxter!</h1>
  </div>
          <div class="content">
          <h1>${title}</h1>

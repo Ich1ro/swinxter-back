@@ -480,11 +480,24 @@ module.exports = {
 				return res.status(404).send('model not found');
 			}
 			console.log(exist);
+
+			let location = {};
+
+			if (city || state || lat || lon) {
+				location = {
+					city: city || exist.location?.city,
+					state: state || exist.location?.state,
+					lat: lat || exist.location?.lat,
+					lon: lon || exist.location?.lon,
+				};
+			}
+
 			if (exist.profile_type == 'single') {
+				let updateData = { ...req.body, location };
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
 					{
-						...req.body,
+						updateData
 					},
 					{ new: true }
 				);
@@ -501,10 +514,11 @@ module.exports = {
 				await data.save();
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {
+				let updateData = { ...req.body, location };
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
 					{
-						...req.body,
+						updateData
 					},
 					{ new: true }
 				);

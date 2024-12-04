@@ -103,6 +103,12 @@ const UserSchema = new mongoose.Schema(
 		modelVerify: { type: Boolean, default: false },
 		otp: { type: String },
 		personName: { type: String },
+		location: {
+			lat: { type: String },
+			lon: { type: String },
+			state: { type: String },
+			city: { type: String }
+		},
 
 		couple: {
 			person1: {

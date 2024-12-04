@@ -470,12 +470,12 @@ module.exports = {
 
 	async update(req, res) {
 		try {
-			let jsonData = {};
-			if (req.body.jsonData) {
-				jsonData = JSON.parse(req.body.jsonData);
-			}
+			// let jsonData = {};
+			// if (req.body.jsonData) {
+			// 	jsonData = JSON.parse(req.body.jsonData);
+			// }
 
-			const { userId, location, geometry, interests } = jsonData;
+			const { userId, location, geometry, interests } = req.body;
 
 			if (!userId) {
 				return res.status(404).send('required the userId');
@@ -485,25 +485,13 @@ module.exports = {
 				return res.status(404).send('model not found');
 			}
 			console.log(exist);
+			const geoData = JSON.parse(geometry)
 
 			if (exist.profile_type == 'single') {
 				const updateData = {
-					...jsonData,
+					...req.body,
+					geometry: geoData
 				};
-
-				// if (interests) {
-				// 	updateData.interests = Array.isArray(interests)
-				// 		? interests
-				// 		: JSON.parse(interests);
-				// }
-
-				if (location) {
-					updateData.location = location;
-				}
-
-				if (geometry) {
-					updateData.geometry = geometry;
-				}
 
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
@@ -516,14 +504,25 @@ module.exports = {
 					console.log('HIOP');
 				}
 
+				if (req.body.interests) {
+					data.interests = JSON.parse(req.body.interests);
+				}
+
+				if (req.body.location) {
+					data.location = JSON.parse(req.body.location);
+				}
+
 				await data.save();
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {
+				const updateData = {
+					...req.body,
+					geometry: geoData
+				};
+
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
-					{
-						...req.body,
-					},
+					updateData,
 					{ new: true }
 				);
 

@@ -7,6 +7,14 @@ const MediaSchema = new Schema({
 	isPublic: { type: Boolean },
 });
 
+const GeoSchema = new Schema({
+	type: {
+		type: String,
+		enum: ['Point'],
+	},
+	coordinates: [Number]
+});
+
 const UserSchema = new mongoose.Schema(
 	{
 		profile_type: {
@@ -106,16 +114,8 @@ const UserSchema = new mongoose.Schema(
 		location: {
 			state: { type: String },
 			city: { type: String },
-			geometry: {
-				type: {
-				  type: String,
-				  enum: ['Point'],
-				},
-				coordinates: {
-				  type: [Number]
-				}
-			  }
 		},
+		geometry: GeoSchema,
 
 		couple: {
 			person1: {

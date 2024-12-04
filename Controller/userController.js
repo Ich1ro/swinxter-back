@@ -1248,13 +1248,13 @@ module.exports = {
 		}
 	},
 	async nearUsers(req, res) {
-		const { lon, lat } = req.params;
+		const { lon, lat, radius } = req.params;
 		try {
 			const data = await userModel.find({
 				'geometry': {
 					$near: {
 						$geometry: { type: "Point", coordinates: [+lon, +lat] },
-						$maxDistance: 250000,
+						$maxDistance: +radius || 250000,
 					},
 				},
 			});

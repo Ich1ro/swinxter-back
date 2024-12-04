@@ -104,10 +104,17 @@ const UserSchema = new mongoose.Schema(
 		otp: { type: String },
 		personName: { type: String },
 		location: {
-			lat: { type: String },
-			lon: { type: String },
 			state: { type: String },
-			city: { type: String }
+			city: { type: String },
+			geometry: {
+				type: {
+				  type: String,
+				  enum: ['Point'],
+				},
+				coordinates: {
+				  type: [Number]
+				}
+			  }
 		},
 
 		couple: {

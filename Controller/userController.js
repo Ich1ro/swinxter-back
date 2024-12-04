@@ -470,7 +470,12 @@ module.exports = {
 
 	async update(req, res) {
 		try {
-			const { userId } = req.body;
+			let jsonData = {};
+			if (req.body.jsonData) {
+				jsonData = JSON.parse(req.body.jsonData);
+			}
+
+			const { userId, location, geometry, interests } = jsonData;
 
 			if (!userId) {
 				return res.status(404).send('required the userId');
@@ -482,29 +487,33 @@ module.exports = {
 			console.log(exist);
 
 			if (exist.profile_type == 'single') {
+				const updateData = {
+					...jsonData,
+				};
+
+				if (interests) {
+					updateData.interests = Array.isArray(interests)
+						? interests
+						: JSON.parse(interests);
+				}
+
+				if (location) {
+					updateData.location = location;
+				}
+
+				if (geometry) {
+					updateData.geometry = geometry;
+				}
+
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
-					{
-						...req.body,
-					},
+					updateData,
 					{ new: true }
 				);
 				console.log(data.image);
 
 				if (!data.image) {
 					console.log('HIOP');
-				}
-
-				if (req.body.interests) {
-					data.interests = JSON.parse(req.body?.interests);
-				}
-
-				if (req.body.location) {
-					data.location = JSON.parse(req.body.location);
-				}
-
-				if (req.body.geometry) {
-					data.geometry = JSON.parse(req.body.geometry);
 				}
 
 				await data.save();

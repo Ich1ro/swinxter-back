@@ -1248,6 +1248,27 @@ module.exports = {
 			return res.status(500).send(e);
 		}
 	},
+	async nearUsers(req, res) {
+		const {lon, lat} = req.body
+		try {
+			const data = await userModel.find({
+				'geometry': {
+					$near: {
+						$geometry: { type: "Point", coordinates: [lon, lat] },
+						$maxDistance: 250000,
+					},
+				},
+			});
+			if (!data) {
+				return res.status(400).send('something went wrong');
+			} else {
+				return res.status(200).send(data);
+			}
+		} catch (e) {
+			console.log(e);
+			return res.status(500).send(e);
+		}
+	},
 	async zegoToken(req, res) {
 		try {
 			const appID = 1687841660;

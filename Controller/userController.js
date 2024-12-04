@@ -483,12 +483,12 @@ module.exports = {
 
 			let location = {};
 
-			if (city || state || lat || lon) {
+			if (req.body.city || req.body.state || req.body.lat || req.body.lon) {
 				location = {
-					city: city || exist.location?.city,
-					state: state || exist.location?.state,
-					lat: lat || exist.location?.lat,
-					lon: lon || exist.location?.lon,
+					city: req.body.city,
+					state: req.body.state,
+					lat: req.body.lat,
+					lon: req.body.lon,
 				};
 			}
 

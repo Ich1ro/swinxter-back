@@ -493,7 +493,7 @@ module.exports = {
 			}
 
 			if (exist.profile_type == 'single') {
-				let updateData = { ...req.body, location };
+				let updateData = { ...req.body, location: location };
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
 					{
@@ -514,7 +514,7 @@ module.exports = {
 				await data.save();
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {
-				let updateData = { ...req.body, location };
+				let updateData = { ...req.body, location: location };
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
 					{

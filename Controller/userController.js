@@ -502,6 +502,11 @@ module.exports = {
 				if (req.body.location) {
 					data.location = JSON.parse(req.body.location);
 				}
+
+				if (req.body.geometry) {
+					data.geometry = JSON.parse(req.body.geometry);
+				}
+
 				data.index({geometry: '2dsphere'})
 
 				await data.save();

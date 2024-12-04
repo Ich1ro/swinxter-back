@@ -1340,6 +1340,7 @@ module.exports = {
 					);
 					query.DOB = { $gte: minDOB, $lte: maxDOB };
 				}
+				
 
 				if (single.interests && single.interests.length > 0) {
 					query['interests.male'] = { $in: single.interests };
@@ -1348,6 +1349,13 @@ module.exports = {
 				if (single.drinking) query.drinking = single.drinking;
 				if (single.bodyType && single.bodyType.length > 0) {
 					query.body_type = { $in: single.bodyType };
+				}
+				if (single.weightRange && single.weightRange.length === 2) {
+					const [minWeight, maxWeight] = single.weightRange;
+					query.weight = {
+						$gte: `${minWeight} kg`,
+						$lte: `${maxWeight} kg`,
+					};
 				}
 			} else if (accountType === 'couple') {
 				query.profile_type = 'couple';
@@ -1380,6 +1388,13 @@ module.exports = {
 					);
 					query['couple.person1.DOB'] = { $gte: minDOB, $lte: maxDOB };
 				}
+				if (person1.weightRange && person1.weightRange.length === 2) {
+					const [minWeight, maxWeight] = person1.weightRange;
+					query['couple.person1.weight'] = {
+						$gte: `${minWeight} kg`,
+						$lte: `${maxWeight} kg`,
+					};
+				}
 
 				if (person2.bodyType && person2.bodyType.length > 0) {
 					query['couple.person2.body_type'] = { $in: person2.bodyType };
@@ -1397,6 +1412,13 @@ module.exports = {
 						new Date().setFullYear(new Date().getFullYear() - minAge)
 					);
 					query['couple.person2.DOB'] = { $gte: minDOB, $lte: maxDOB };
+				}
+				if (person2.weightRange && person2.weightRange.length === 2) {
+					const [minWeight, maxWeight] = person2.weightRange;
+					query['couple.person2.weight'] = {
+						$gte: `${minWeight} kg`,
+						$lte: `${maxWeight} kg`,
+					};
 				}
 			}
 

@@ -491,11 +491,11 @@ module.exports = {
 					...jsonData,
 				};
 
-				if (interests) {
-					updateData.interests = Array.isArray(interests)
-						? interests
-						: JSON.parse(interests);
-				}
+				// if (interests) {
+				// 	updateData.interests = Array.isArray(interests)
+				// 		? interests
+				// 		: JSON.parse(interests);
+				// }
 
 				if (location) {
 					updateData.location = location;

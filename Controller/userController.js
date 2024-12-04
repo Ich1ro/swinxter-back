@@ -507,8 +507,6 @@ module.exports = {
 					data.geometry = JSON.parse(req.body.geometry);
 				}
 
-				data.index({geometry: '2dsphere'})
-
 				await data.save();
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {

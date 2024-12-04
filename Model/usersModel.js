@@ -173,6 +173,7 @@ const UserSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
+UserSchema.index({ geometry: '2dsphere' });
 
 const User = mongoose.model('User', UserSchema);
 

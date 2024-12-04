@@ -115,7 +115,7 @@ router.get("/zego_token", userController.zegoToken);
 router.get("/user_details/:id", userController.userdetail);
 router.get("/recentusers", userController.RecentUsers);
 router.get("/users", userController.allUsers);
-router.get("/near-users", userController.nearUsers);
+router.get("/near-users/:lon/:lat", userController.nearUsers);
 router.put("/remove_friend/:id/:friendId", userController.removeFriend);
 router.put("/send_request/:id/:friendId", userController.sendFriendRequest);
 router.put("/cancel_request/:id/:friendId", userController.cancelFriendRequest);

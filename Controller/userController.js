@@ -481,23 +481,11 @@ module.exports = {
 			}
 			console.log(exist);
 
-			let location = {};
-
-			if (req.body.city || req.body.state || req.body.lat || req.body.lon) {
-				location = {
-					city: req.body.city,
-					state: req.body.state,
-					lat: req.body.lat,
-					lon: req.body.lon,
-				};
-			}
-
 			if (exist.profile_type == 'single') {
-				let updateData = { ...req.body, location: location };
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
 					{
-						updateData
+						...req.body,
 					},
 					{ new: true }
 				);
@@ -511,23 +499,33 @@ module.exports = {
 					data.interests = JSON.parse(req.body?.interests);
 				}
 
+				if (req.body.location) {
+					data.location = JSON.parse(req.body.location);
+				}
+
 				await data.save();
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {
-				let updateData = { ...req.body, location: location };
 				const data = await userModel.findOneAndUpdate(
 					{ _id: userId },
 					{
-						updateData
+						...req.body,
 					},
 					{ new: true }
 				);
+
 				if (req.body.interests) {
 					data.interests = JSON.parse(req.body.interests);
 				}
+
 				if (req.body.couple) {
 					data.couple = JSON.parse(req.body.couple);
 				}
+
+				if (req.body.location) {
+					data.location = JSON.parse(req.body.location);
+				}
+
 				await data.save();
 				return res.status(200).send(data);
 			}

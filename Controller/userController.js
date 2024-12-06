@@ -1396,7 +1396,7 @@ module.exports = {
 	async advancedSearch(req, res) {
 		try {
 			const filters = req.body;
-			const { accountType, single, person1, person2 } = filters;
+			const { accountType, single, person1, person2, location } = filters;
 
 			const query = {};
 
@@ -1497,6 +1497,16 @@ module.exports = {
 						$lte: `${maxWeight} kg`,
 					};
 				}
+			}
+
+			if (location && location.lon && location.lat) {
+				const { lon, lat, radius } = location;
+				query.geometry = {
+					$near: {
+						$geometry: { type: 'Point', coordinates: [+lon, +lat] },
+						$maxDistance: +radius || 250000,
+					},
+				};
 			}
 
 			const users = await userModel.find(query);

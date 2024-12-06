@@ -485,6 +485,83 @@ module.exports = {
 				return res.status(404).send('model not found');
 			}
 			console.log(exist);
+			// const geoData = JSON.parse(geometry)
+
+			if (exist.profile_type == 'single') {
+				const updateData = {
+					...req.body,
+				};
+
+				const data = await userModel.findOneAndUpdate(
+					{ _id: userId },
+					updateData,
+					{ new: true }
+				);
+				console.log(data.image);
+
+				if (!data.image) {
+					console.log('HIOP');
+				}
+
+				if (req.body.interests) {
+					data.interests = req.body.interests;
+				}
+
+				if (req.body.location) {
+					data.location = req.body.location;
+				}
+
+				await data.save();
+				return res.status(200).send(data);
+			} else if (exist.profile_type == 'couple') {
+				const updateData = {
+					...req.body,
+					geometry: geoData
+				};
+
+				const data = await userModel.findOneAndUpdate(
+					{ _id: userId },
+					updateData,
+					{ new: true }
+				);
+
+				if (req.body.interests) {
+					data.interests = req.body.interests;
+				}
+
+				if (req.body.couple) {
+					data.couple = req.body.couple;
+				}
+
+				if (req.body.location) {
+					data.location = req.body.location;
+				}
+
+				await data.save();
+				return res.status(200).send(data);
+			}
+		} catch (e) {
+			console.log(e);
+			return res.status(500).send(e);
+		}
+	},
+	async createUserInfo(req, res) {
+		try {
+			// let jsonData = {};
+			// if (req.body.jsonData) {
+			// 	jsonData = JSON.parse(req.body.jsonData);
+			// }
+
+			const { userId, location, geometry, interests } = req.body;
+
+			if (!userId) {
+				return res.status(404).send('required the userId');
+			}
+			const exist = await userModel.findOne({ _id: userId });
+			if (!exist) {
+				return res.status(404).send('model not found');
+			}
+			console.log(exist);
 			const geoData = JSON.parse(geometry)
 
 			if (exist.profile_type == 'single') {

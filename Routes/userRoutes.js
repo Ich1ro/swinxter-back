@@ -53,6 +53,15 @@ router.put(
     { name: "image", maxCount: 1 },
     { name: "videos", maxCount: 1000 * 100 * 10 },
   ]),
+  userController.createUserInfo,
+);
+router.put(
+  "/update-user",
+  upload.fields([
+    { name: "images", maxCount: 1000 * 100 * 10 },
+    { name: "image", maxCount: 1 },
+    { name: "videos", maxCount: 1000 * 100 * 10 },
+  ]),
   userController.update,
 );
 router.delete("/delete_user/:id", verifyAdmin, user.delete_user);

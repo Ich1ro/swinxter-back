@@ -514,8 +514,10 @@ module.exports = {
 				await data.save();
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {
+				const coupleData = JSON.parse(req.body.couple)
 				const updateData = {
-					...req.body
+					...req.body,
+					couple: coupleData
 				};
 
 				const data = await userModel.findOneAndUpdate(
@@ -561,7 +563,7 @@ module.exports = {
 				return res.status(404).send('model not found');
 			}
 			console.log(exist);
-			const geoData = JSON.parse(geometry)
+			// const geoData = JSON.parse(geometry)
 
 			if (exist.profile_type == 'single') {
 				const updateData = {
@@ -593,7 +595,7 @@ module.exports = {
 			} else if (exist.profile_type == 'couple') {
 				const updateData = {
 					...req.body,
-					geometry: geoData
+					couple: coupleData,
 				};
 
 				const data = await userModel.findOneAndUpdate(

@@ -114,6 +114,7 @@ const UserSchema = new mongoose.Schema(
 		location: {
 			state: { type: String },
 			city: { type: String },
+			country: { type: String }
 		},
 		geometry: GeoSchema,
 

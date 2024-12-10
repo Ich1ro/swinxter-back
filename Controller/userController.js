@@ -515,8 +515,7 @@ module.exports = {
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {
 				const updateData = {
-					...req.body,
-					geometry: geoData
+					...req.body
 				};
 
 				const data = await userModel.findOneAndUpdate(

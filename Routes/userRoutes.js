@@ -95,6 +95,7 @@ router.put(
   upload.fields([
     { name: "images", maxCount: 1000 * 100 * 10 },
     { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 },
     { name: "videos", maxCount: 1000 * 100 * 10 },
   ]),
   user.upload_video,

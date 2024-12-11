@@ -445,46 +445,46 @@ module.exports = {
 				return res.status(404).send("User doesn't exist");
 			}
 
-			// if (!req.files || !req.files.video || req.files.video.length === 0) {
-			// 	return res.status(400).send('Video file is required');
-			// }
+			if (!req.files || !req.files.video || req.files.video.length === 0) {
+				return res.status(400).send('Video file is required');
+			}
 
-			// const file = req.files.video[0];
-			// console.log(file);
+			const file = req.files.video[0];
+			console.log(file);
 			
 
-			// const videoUrl = await S3Manager.put('users', file);
-			// const video = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${videoUrl}`;
+			const videoUrl = await S3Manager.put('users', file);
+			const video = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${videoUrl}`;
 
-			// const videoInfo = {
-			// 	video: video,
-			// 	description: req.body.description,
-			// 	isPublic: req.body.isPublic || true,
-			// };
+			const videoInfo = {
+				video: video,
+				description: req.body.description,
+				isPublic: req.body.isPublic || true,
+			};
 
-			// const newPassword = req?.body?.privatePassword;
+			const newPassword = req?.body?.privatePassword;
 
-			// const updatedData = {
-			// 	$push: { videos: videoInfo },
-			// };
+			const updatedData = {
+				$push: { videos: videoInfo },
+			};
 
-			// if (newPassword) {
-			// 	// const newPassword = await bcrypt.hash(password, 10);
-			// 	updatedData.$set = {
-			// 		...updatedData.$set,
-			// 		privatePassword: newPassword,
-			// 	};
-			// }
+			if (newPassword) {
+				// const newPassword = await bcrypt.hash(password, 10);
+				updatedData.$set = {
+					...updatedData.$set,
+					privatePassword: newPassword,
+				};
+			}
 
-			// const updatedUser = await userModel.findByIdAndUpdate(
-			// 	userId,
-			// 	updatedData,
-			// 	{ new: true }
-			// );
+			const updatedUser = await userModel.findByIdAndUpdate(
+				userId,
+				updatedData,
+				{ new: true }
+			);
 
-			// if (!updatedUser) {
-			// 	return res.status(400).send('Failed to Upload Image');
-			// }
+			if (!updatedUser) {
+				return res.status(400).send('Failed to Upload Image');
+			}
 
 			return res.status(200).send(req.files);
 		} catch (error) {

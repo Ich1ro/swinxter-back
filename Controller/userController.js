@@ -450,8 +450,6 @@ module.exports = {
 			}
 
 			const file = req.files.video[0];
-			console.log(file);
-			
 
 			const videoUrl = await S3Manager.put('users', file);
 			const video = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${videoUrl}`;

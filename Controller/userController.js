@@ -486,7 +486,7 @@ module.exports = {
 				return res.status(400).send('Failed to Upload Image');
 			}
 
-			return res.status(200).send(req.files);
+			return res.status(200).send(updatedUser);
 		} catch (error) {
 			console.error(error);
 			return res.status(500).send(error.message);

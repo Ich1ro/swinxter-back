@@ -91,6 +91,15 @@ router.put(
   user.upload_media,
 );
 router.put(
+  "/upload_video/:userId",
+  upload.fields([
+    { name: "images", maxCount: 1000 * 100 * 10 },
+    { name: "image", maxCount: 1 },
+    { name: "videos", maxCount: 1000 * 100 * 10 },
+  ]),
+  user.upload_video,
+);
+router.put(
   "/delete_media/:userId",
   upload.fields([
     { name: "images", maxCount: 1000 * 100 * 10 },

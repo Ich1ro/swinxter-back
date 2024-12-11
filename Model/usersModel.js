@@ -7,6 +7,13 @@ const MediaSchema = new Schema({
 	isPublic: { type: Boolean },
 });
 
+const VideoSchema = new Schema({
+	video: { type: String, required: true },
+	description: { type: String },
+	uploadedAt: { type: Date, default: Date.now },
+	isPublic: { type: Boolean },
+});
+
 const GeoSchema = new Schema({
 	type: {
 		type: String,
@@ -102,7 +109,7 @@ const UserSchema = new mongoose.Schema(
 		album: [{ type: String }],
 		mymedia: [MediaSchema],
 		images: [{ type: String }],
-		videos: [{ type: String }],
+		videos: [VideoSchema],
 		isLive: { type: Boolean, default: false },
 		favouriteModels: [String],
 		commission: { type: String },

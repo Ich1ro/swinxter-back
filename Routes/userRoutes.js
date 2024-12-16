@@ -64,7 +64,7 @@ router.put(
   ]),
   userController.update,
 );
-router.delete("/delete_user/:id", verifyAdmin, user.delete_user);
+router.delete("/delete_user/:id", user.delete_user);
 router.get("/search_user", user.search_user);
 router.post("/logout/:id", user.logout);
 router.put("/changePassword", verifyToken, user.changePassword);

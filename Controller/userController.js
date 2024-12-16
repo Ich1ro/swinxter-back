@@ -627,7 +627,7 @@ module.exports = {
 			if (exist.profile_type == 'single') {
 				const updateData = {
 					...req.body,
-					geometry: geoData
+					geometry: JSON.parse(geometry)
 				};
 
 				const data = await userModel.findOneAndUpdate(

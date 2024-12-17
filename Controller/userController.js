@@ -1647,12 +1647,12 @@ module.exports = {
 	async getFriends(req, res) {
 		try {
 			const { friendIds } = req.body;
-
+			
 			if (!friendIds || !Array.isArray(friendIds)) {
 				return res.status(400).send({ error: 'Invalid friendIds array' });
 			}
 
-			const friends = await userModel.find({ id: { $in: friendIds } });
+			const friends = await userModel.find({ _id: { $in: friendIds } });
 			res.status(200).send(friends);
 		} catch (e) {
 			res.status(404).send(e.message || e);

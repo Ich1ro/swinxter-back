@@ -144,7 +144,7 @@ router.post("/unblockuser", userController.unblockUser);
 router.post("/superlike", userController.superlike);
 router.post("/notifications", userController.sendNotification);
 router.get("/notifications/:userId", userController.getNotifications);
-router.post("/getFriends", userController.getFriends);
+router.post("/get-friends", userController.getFriends);
 router.get("/notifications-status/:id", userController.readNotification);
 router.post("/set-notifications/:userId", userController.setNotificationCount);
 router.post("/create-subscription", userController.add_subscription);

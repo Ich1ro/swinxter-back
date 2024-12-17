@@ -1657,6 +1657,16 @@ module.exports = {
 			res.status(404).send(e.message || e);
 		}
 	},
+	async readNotification(req, res) {
+		try {
+			const notification = await notificationModel.findOne({ _id: req.params.id });
+			notification.read = true;
+			notification.save();
+			res.status(200).send('Notification read status changed');
+		} catch (e) {
+			res.status(404).send(e.message || e);
+		}
+	},
 	async sendDummyEmails(req, res) {
 		let html = welcome_user('Member');
 		let mailOptions = {

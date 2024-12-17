@@ -144,6 +144,7 @@ router.post("/unblockuser", userController.unblockUser);
 router.post("/superlike", userController.superlike);
 router.post("/notifications", userController.sendNotification);
 router.get("/notifications/:userId", userController.getNotifications);
+router.get("/notifications-status/:id", userController.readNotification);
 router.post("/set-notifications/:userId", userController.setNotificationCount);
 router.post("/create-subscription", userController.add_subscription);
 router.post("/advanced-search", userController.advancedSearch)

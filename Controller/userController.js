@@ -1653,7 +1653,7 @@ module.exports = {
 			}
 
 			const friends = await userModel.find({ id: { $in: friendIds } });
-			res.status(200).send(user.notifications);
+			res.status(200).send(friends);
 		} catch (e) {
 			res.status(404).send(e.message || e);
 		}

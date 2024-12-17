@@ -451,7 +451,6 @@ module.exports = {
 
 			const file = req.files.video[0];
 			console.log(file);
-			
 
 			const videoUrl = await S3Manager.put('users', file);
 			const video = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${videoUrl}`;
@@ -576,7 +575,7 @@ module.exports = {
 				return res.status(200).send(data);
 			} else if (exist.profile_type == 'couple') {
 				const updateData = {
-					...req.body
+					...req.body,
 				};
 
 				const data = await userModel.findOneAndUpdate(
@@ -627,7 +626,7 @@ module.exports = {
 			if (exist.profile_type == 'single') {
 				const updateData = {
 					...req.body,
-					geometry: JSON.parse(geometry)
+					geometry: JSON.parse(geometry),
 				};
 
 				const data = await userModel.findOneAndUpdate(
@@ -1388,9 +1387,9 @@ module.exports = {
 		const { lon, lat, radius } = req.params;
 		try {
 			const data = await userModel.find({
-				'geometry': {
+				geometry: {
 					$near: {
-						$geometry: { type: "Point", coordinates: [+lon, +lat] },
+						$geometry: { type: 'Point', coordinates: [+lon, +lat] },
 						$maxDistance: +radius || 250000,
 					},
 				},
@@ -1477,7 +1476,6 @@ module.exports = {
 					);
 					query.DOB = { $gte: minDOB, $lte: maxDOB };
 				}
-				
 
 				if (single.interests && single.interests.length > 0) {
 					query['interests.male'] = { $in: single.interests };
@@ -1646,10 +1644,24 @@ module.exports = {
 			res.status(404).send(e.message || e);
 		}
 	},
+	async getFriends(req, res) {
+		try {
+			const { friendIds } = req.body;
+
+			if (!friendIds || !Array.isArray(friendIds)) {
+				return res.status(400).send({ error: 'Invalid friendIds array' });
+			}
+
+			const friends = await userModel.find({ id: { $in: friendIds } });
+			res.status(200).send(user.notifications);
+		} catch (e) {
+			res.status(404).send(e.message || e);
+		}
+	},
 	async setNotificationCount(req, res) {
 		try {
 			const user = await userModel.findOne({ _id: req.params.userId });
-			const {count} = req.body
+			const { count } = req.body;
 			user.lastNotificationCount = count;
 			user.save();
 			res.status(200).send('Notification count set');
@@ -1659,7 +1671,9 @@ module.exports = {
 	},
 	async readNotification(req, res) {
 		try {
-			const notification = await notificationModel.findOne({ _id: req.params.id });
+			const notification = await notificationModel.findOne({
+				_id: req.params.id,
+			});
 			notification.read = true;
 			notification.save();
 			res.status(200).send('Notification read status changed');
@@ -1697,7 +1711,7 @@ module.exports = {
 			amount,
 			month_freq,
 			day_of_month,
-			plan
+			plan,
 		} = req.body;
 		const expiry = `${expmm}${expyy?.slice(-2)}`;
 

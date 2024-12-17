@@ -720,10 +720,10 @@ module.exports = {
 				{ token: null, isLogged: false },
 				{ new: true }
 			);
-			const user = await userModel.findById(req.params.id);
-			let notificationCount = user.notifications.length;
-			user.lastNotificationCount = notificationCount;
-			user.save();
+			// const user = await userModel.findById(req.params.id);
+			// let notificationCount = user.notifications.length;
+			// user.lastNotificationCount = notificationCount;
+			// user.save();
 			if (!data) {
 				return res.status(404).send({ message: 'User not found' });
 			}
@@ -1649,8 +1649,8 @@ module.exports = {
 	async setNotificationCount(req, res) {
 		try {
 			const user = await userModel.findOne({ _id: req.params.userId });
-			let notificationCount = user.notifications.length;
-			user.lastNotificationCount = notificationCount;
+			const {count} = req.body
+			user.lastNotificationCount = count;
 			user.save();
 			res.status(200).send('Notification count set');
 		} catch (e) {
@@ -1687,6 +1687,7 @@ module.exports = {
 			amount,
 			month_freq,
 			day_of_month,
+			plan
 		} = req.body;
 		const expiry = `${expmm}${expyy?.slice(-2)}`;
 
@@ -1737,7 +1738,7 @@ module.exports = {
 					);
 					existingUser.payment.membership = true;
 					existingUser.payment.last_payment = new Date();
-					existingUser.payment.membership_plan = month_freq;
+					existingUser.payment.membership_plan = plan;
 					existingUser.payment.membership_expiry = futureDate;
 					existingUser.payment.membership_price = amount;
 					existingUser.save();

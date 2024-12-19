@@ -1755,11 +1755,24 @@ module.exports = {
 
 				if (lastThree === 100 || lastThree === '100') {
 					const newToday = new Date();
-					const futureDate = new Date(
-						newToday.getFullYear(),
-						newToday.getMonth() + Number(month_freq),
-						newToday.getDate()
-					);
+					let futureDate
+					// const futureDate = new Date(
+					// 	newToday.getFullYear(),
+					// 	newToday.getMonth() + Number(month_freq),
+					// 	newToday.getDate()
+					// );
+					if (plan.includes('Month') || plan.includes('Months')) {
+						futureDate = new Date(
+							newToday.getFullYear(),
+							newToday.getMonth() + Number(plan.replace(/\D/g, '')),
+							newToday.getDate()
+						);
+					} else if (plan.includes('Week') || plan.includes('Weeks')) {
+						futureDate = new Date(newToday.getTime() + 7 * Number(plan.replace(/\D/g, '')) * 24 * 60 * 60 * 1000);
+					} else if (plan.includes('Day') || plan.includes('Days')) {
+						futureDate = new Date(newToday.getTime() + 24 * 60 * 60 * 1000 * Number(plan.replace(/\D/g, '')));
+					}
+	
 					existingUser.payment.membership = true;
 					existingUser.payment.last_payment = new Date();
 					existingUser.payment.membership_plan = plan;

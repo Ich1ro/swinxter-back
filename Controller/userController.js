@@ -684,8 +684,9 @@ module.exports = {
 	},
 	async delete_user(req, res) {
 		try {
-			const data = await userModel.findOneAndDelete({ _id: req.params.id });
-			return res.status(200).send('User delete successfully');
+			await userModel.findOneAndDelete({ _id: req.params.id });
+			const updatedUsers = await userModel.find();
+			return res.status(200).send(updatedUsers);
 		} catch (e) {
 			return res.status(500).send(e);
 		}
@@ -1796,20 +1797,30 @@ module.exports = {
 	async approveUser(req, res) {
 		const { id } = req.params;
 		const { suspend } = req.body;
-		if (suspend) {
-			const data = await userModel.findOneAndUpdate(
-				{ _id: id },
-				{ isverify: false },
-				{ new: true }
-			);
-			return res.status(200).send(data);
+
+		try {
+			if (suspend) {
+				await userModel.findOneAndUpdate(
+					{ _id: id },
+					{ isverify: false },
+					{ new: true }
+				);
+			} else {
+				const user = await userModel.findById(id);
+				if (!user) {
+					return res.status(404).send({ message: 'User not found' });
+				}
+				user.isverify = true;
+				await user.save();
+			}
+
+			const updatedUsers = await userModel.find();
+
+			res.status(200).send(updatedUsers);
+		} catch (error) {
+			console.error('Error updating user:', error);
+			res.status(500).send({ message: 'Internal server error' });
 		}
-		console.log(id);
-		const data = await userModel.findById(id);
-		console.log(data);
-		data.isverify = true;
-		data.save();
-		res.status(200).send('verified');
 	},
 };
 

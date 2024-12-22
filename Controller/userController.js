@@ -1770,7 +1770,7 @@ module.exports = {
 					} else if (plan.includes('Week') || plan.includes('Weeks')) {
 						futureDate = new Date(newToday.getTime() + 7 * Number(plan.replace(/\D/g, '')) * 24 * 60 * 60 * 1000);
 					} else if (plan.includes('Day') || plan.includes('Days')) {
-						futureDate = new Date(newToday.getTime() + 24 * 60 * 60 * 1000 * Number(plan.replace(/\D/g, '')));
+						futureDate = new Date(newToday.getTime() + Number(plan.replace(/\D/g, '')) * 24 * 60 * 60 * 1000);
 					}
 	
 					existingUser.payment.membership = true;

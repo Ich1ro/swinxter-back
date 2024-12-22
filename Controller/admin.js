@@ -20,7 +20,13 @@ module.exports = {
       if(passCheck){
         const token = jwt.sign({id: user._id}, process.env.JWT_SECRETKEY);
         const {password: pass, ...rest} = user._doc;
-        return res.cookie('access_token', token,{expires:new Date(Date.now() + 25892000000)}).status(200).send(rest);
+        const options = {
+					expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+					httpOnly: true,
+					sameSite: 'none',
+					secure: true,
+				};
+        return res.cookie('access_token', token, options).status(200).send(rest);
       }
       else{
         return res.status(400).send("Invalid Credentials");

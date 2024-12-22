@@ -1647,7 +1647,7 @@ module.exports = {
 	async getFriends(req, res) {
 		try {
 			const { friendIds } = req.body;
-			
+
 			if (!friendIds || !Array.isArray(friendIds)) {
 				return res.status(400).send({ error: 'Invalid friendIds array' });
 			}
@@ -1755,7 +1755,7 @@ module.exports = {
 
 				if (lastThree === 100 || lastThree === '100') {
 					const newToday = new Date();
-					let futureDate
+					let futureDate;
 					// const futureDate = new Date(
 					// 	newToday.getFullYear(),
 					// 	newToday.getMonth() + Number(month_freq),
@@ -1768,11 +1768,17 @@ module.exports = {
 							newToday.getDate()
 						);
 					} else if (plan.includes('Week') || plan.includes('Weeks')) {
-						futureDate = new Date(newToday.getTime() + 7 * Number(plan.replace(/\D/g, '')) * 24 * 60 * 60 * 1000);
+						futureDate = new Date(
+							newToday.getTime() +
+								7 * Number(plan.replace(/\D/g, '')) * 24 * 60 * 60 * 1000
+						);
 					} else if (plan.includes('Day') || plan.includes('Days')) {
-						futureDate = new Date(newToday.getTime() + Number(plan.replace(/\D/g, '')) * 24 * 60 * 60 * 1000);
+						futureDate = new Date(
+							newToday.getTime() +
+								Number(plan.replace(/\D/g, '')) * 24 * 60 * 60 * 1000
+						);
 					}
-	
+
 					existingUser.payment.membership = true;
 					existingUser.payment.last_payment = new Date();
 					existingUser.payment.membership_plan = plan;
@@ -1786,6 +1792,24 @@ module.exports = {
 				return res.status(500).send(error.message);
 			}
 		}
+	},
+	async approveUser(req, res) {
+		const { id } = req.params;
+		const { suspend } = req.body;
+		if (suspend) {
+			const data = await userModel.findOneAndUpdate(
+				{ _id: id },
+				{ isverify: false },
+				{ new: true }
+			);
+			return res.status(200).send(data);
+		}
+		console.log(id);
+		const data = await userModel.findById(id);
+		console.log(data);
+		data.isverify = true;
+		data.save();
+		res.status(200).send('verified');
 	},
 };
 

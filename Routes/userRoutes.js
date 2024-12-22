@@ -149,6 +149,7 @@ router.get("/notifications-status/:id", userController.readNotification);
 router.post("/set-notifications/:userId", userController.setNotificationCount);
 router.post("/create-subscription", userController.add_subscription);
 router.post("/advanced-search", userController.advancedSearch)
+router.post("/approve_user/:id", userController.approveUser)
 
 
 router.post("/send_dummy_emails", userController.sendDummyEmails);

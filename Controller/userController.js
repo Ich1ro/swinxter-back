@@ -1797,27 +1797,21 @@ module.exports = {
 	async approveUser(req, res) {
 		const { id } = req.params;
 		const { suspend } = req.body;
-		console.log(id);
-		console.log(suspend);
-		
 
 		try {
 			if (suspend) {
 				const updated = await userModel.findOneAndUpdate(
 					{ _id: id },
-					{ isverify: false },
+					{ isVerify: false },
 					{ new: true }
 				);
-				console.log(updated);
 				
 			} else {
 				const user = await userModel.findById(id);
 				if (!user) {
 					return res.status(404).send({ message: 'User not found' });
 				}
-				user.isverify = true;
-				console.log(user);
-				
+				user.isVerify = true;
 				await user.save();
 			}
 

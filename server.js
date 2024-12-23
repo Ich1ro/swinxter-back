@@ -29,7 +29,7 @@ var corsOptions = {
     "https://swinxter-admin.vercel.app",
     "https://www.swinxter.com",
     "https://swinxter-front.vercel.app",
-    "https://swinxter-admin-teal.vercel.app/"
+    "https://swinxter-admin-teal.vercel.app"
   ],
   credentials: true,
 };

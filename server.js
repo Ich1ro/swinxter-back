@@ -28,7 +28,8 @@ var corsOptions = {
     "https://swinxter-v2.vercel.app",
     "https://swinxter-admin.vercel.app",
     "https://www.swinxter.com",
-    "https://swinxter-front.vercel.app"
+    "https://swinxter-front.vercel.app",
+    "https://swinxter-admin-teal.vercel.app/"
   ],
   credentials: true,
 };

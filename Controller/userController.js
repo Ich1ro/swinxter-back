@@ -286,7 +286,7 @@ module.exports = {
 	async findOne(req, res) {
 		try {
 			const { id } = req.params;
-			const data = await userModel.findOne({ _id: id }).select('-password ');
+			const data = await userModel.findOne({ _id: id }).select('-password');
 			if (!data) {
 				return res.status(400).send('Something went wrong');
 			} else {
@@ -297,6 +297,7 @@ module.exports = {
 			return res.status(400).send(e);
 		}
 	},
+	
 	async upload_image(req, res) {
 		const { userId } = req.params;
 		console.log(userId);

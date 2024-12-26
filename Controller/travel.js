@@ -93,6 +93,7 @@ module.exports = {
 							{ person_1_age: { $regex: q, $options: 'i' } },
 							{ person_2_age: { $regex: q, $options: 'i' } },
 							{ location: { $regex: q, $options: 'i' } },
+							{ userId: q },
 						],
 					})
 					.populate('userId', '-password');

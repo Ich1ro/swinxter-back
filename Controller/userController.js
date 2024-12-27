@@ -23,110 +23,148 @@ const { info } = require('console');
 
 module.exports = {
 	async signup(req, res) {
-		const { email, password, username, profile_type, logintype } = req.body;
-		if (!logintype) {
-			try {
-				if (!profile_type || !email || !username) {
+		const {
+			email,
+			password,
+			username,
+			profile_type,
+			logintype,
+			firstName,
+			lastName,
+		} = req.body;
+
+		try {
+			if (!logintype) {
+				if (
+					!profile_type ||
+					!email ||
+					!username ||
+					(profile_type === 'business' && (!firstName || !lastName))
+				) {
 					return res
 						.status(400)
 						.send('Please provide all the required information.');
 				}
-				const exist = await userModel.findOne({ email: email });
+
+				const exist =
+					(await userModel.findOne({ email })) ||
+					(await BusinessUser.findOne({ email }));
 				if (exist) {
 					return res.status(400).send('User with this email already exists.');
 				}
-				const username_exist = await userModel.findOne({ username: username });
+
+				const username_exist =
+					(await userModel.findOne({ username })) ||
+					(await BusinessUser.findOne({ username }));
 				if (username_exist) {
 					return res.status(400).send('Username is already taken.');
 				}
+
 				const hash_password = await bcrypt.hash(password, 10);
-				const data = await userModel.create({
-					...req.body,
-				});
-				data.password = hash_password;
-				await data.save();
-				console.log(hash_password);
+
+				let data;
+				if (profile_type === 'business') {
+					data = await BusinessUser.create({
+						profile_type,
+						email,
+						username,
+						firstName,
+						lastName,
+						password: hash_password,
+					});
+				} else {
+					data = await userModel.create({
+						profile_type,
+						email,
+						username,
+						password: hash_password,
+					});
+				}
+
 				if (!data) {
 					return res.status(400).send('Failed to create the user.');
-				} else {
-					console.log(data, '=============');
-
-					const verificationLink = `${process.env.EmailVerify_link}${data._id}`;
-					let bodyData = { email: data.email, name: data.username };
-					let emailHtml = mailHtml(
-						bodyData,
-						verificationLink,
-						`<h4> Thank you for registering on Swinxter! We're excited to have you join our community.</h4>`
-					);
-					let mailOptions = {
-						from: process.env.Nodemailer_id,
-						to: data.email,
-						subject: 'Verify your email',
-						html: emailHtml,
-					};
-					Mailsend(req, res, mailOptions);
-					return res.status(201).send(data);
 				}
-			} catch (error) {
-				return res.status(500).send(error);
-			}
-		} else {
-			try {
-				const exist = await userModel.findOne({ email });
+
+				const verificationLink = `${process.env.EmailVerify_link}${data._id}`;
+				const bodyData = { email: data.email, name: data.username };
+				const emailHtml = mailHtml(
+					bodyData,
+					verificationLink,
+					`<h4> Thank you for registering on Swinxter! We're excited to have you join our community.</h4>`
+				);
+				const mailOptions = {
+					from: process.env.Nodemailer_id,
+					to: data.email,
+					subject: 'Verify your email',
+					html: emailHtml,
+				};
+				Mailsend(req, res, mailOptions);
+
+				return res.status(201).send(data);
+			} else {
+				const exist =
+					(await userModel.findOne({ email })) ||
+					(await BusinessUser.findOne({ email }));
 				if (exist) {
 					const token = jwt.sign(
 						{ _id: exist._id, email: exist.email, role: exist.role },
 						SECRET_KEY,
-						{
-							expiresIn: '30d',
-							expiresIn: '30d',
-						}
+						{ expiresIn: '30d' }
 					);
 					exist.token = token;
-					exist.save();
+					await exist.save();
 					return res.status(200).send({ statusCode: 200, Message: token });
 				} else {
-					const data = await userModel.create({
-						email: email,
-						username: username,
-						logintype: logintype,
-						isVerify: true,
-					});
-					console.log(data);
+					let data;
+					if (profile_type === 'business') {
+						data = await BusinessUser.create({
+							profile_type,
+							email,
+							username,
+							logintype,
+							firstName,
+							lastName,
+							isVerify: true,
+						});
+					} else {
+						data = await userModel.create({
+							profile_type,
+							email,
+							username,
+							logintype,
+							isVerify: true,
+						});
+					}
+
+					const token = jwt.sign(
+						{ _id: data._id, email: data.email, role: data.role },
+						SECRET_KEY,
+						{ expiresIn: '30d' }
+					);
+					data.token = token;
+					await data.save();
+
 					const verificationLink = `${process.env.EmailVerify_link}${data._id}`;
-					let bodyData = { email: data.email, name: data.username };
-					let emailHtml = mailHtml(
+					const bodyData = { email: data.email, name: data.username };
+					const emailHtml = mailHtml(
 						bodyData,
 						verificationLink,
 						`<h4> Thank you for registering on Swinxter! We're excited to have you join our community.</h4>`
 					);
-					let mailOptions = {
+					const mailOptions = {
 						from: process.env.Nodemailer_id,
 						to: data.email,
 						subject: 'Verify your email',
 						html: emailHtml,
 					};
 					Mailsend(req, res, mailOptions);
-					const token = jwt.sign(
-						{ _id: exist._id, email: exist.email, role: exist.role },
-						SECRET_KEY,
-						{
-							expiresIn: '30d',
-							expiresIn: '30d',
-						}
-					);
-					data.token = token;
-					data.save();
-					if (!data) {
-						return res.status(400).send('Failed to create the user.');
-					} else {
-						res.status(201).send({ statusCode: 201, Message: token });
-					}
+
+					return res.status(201).send({ statusCode: 201, Message: token });
 				}
-			} catch (error) {
-				console.log(error);
-				return res.status(500).send(error);
 			}
+		} catch (error) {
+			console.error(error);
+			return res.status(500).send(error);
 		}
 	},
 	async login(req, res) {
@@ -297,7 +335,7 @@ module.exports = {
 			return res.status(400).send(e);
 		}
 	},
-	
+
 	async upload_image(req, res) {
 		const { userId } = req.params;
 		console.log(userId);
@@ -1806,7 +1844,6 @@ module.exports = {
 					{ isVerify: false },
 					{ new: true }
 				);
-				
 			} else {
 				const user = await userModel.findById(id);
 				if (!user) {

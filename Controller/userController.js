@@ -20,6 +20,7 @@ const axios = require('axios');
 const { URLSearchParams } = require('url');
 const { S3Manager } = require('../utils/s3');
 const { info } = require('console');
+const BusinessUser = require('../Model/businessUsersModel')
 
 module.exports = {
 	async signup(req, res) {
@@ -119,8 +120,6 @@ module.exports = {
 							email,
 							username,
 							logintype,
-							firstName,
-							lastName,
 							isVerify: true,
 						});
 					} else {

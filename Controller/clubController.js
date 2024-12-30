@@ -41,6 +41,15 @@ module.exports = {
 
 			let image = [];
 			let video = [];
+
+			const updateData = {
+				...req.body,
+				mainImage: mainImage,
+				image: [],
+				video: [],
+				owner_name: userExist.username,
+				ownerId: userExist._id,
+			};
 			// if (req.files['image']) {
 			// 	for (const images of req.files['image']) {
 			// 		image.push(`${process.env.Backend_URL_Image}${images.filename}`);
@@ -55,20 +64,7 @@ module.exports = {
 
 			const t2 = JSON.parse(location);
 			const data = await clubModel.create({
-				ownerId: userExist._id,
-				business_name: clubname,
-				location: t2,
-				geometry: geometry,
-				business_type: clubtype,
-				owner_name: userExist.username,
-				image: image,
-				video: video,
-				mainImage: mainImage,
-				description: description,
-				introduction: introduction,
-				contact: contact,
-				website: website,
-				email: email,
+				...updateData
 			});
 			if (!data) {
 				return res.status(400).send('Failed to Create club');

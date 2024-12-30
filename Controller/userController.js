@@ -1825,6 +1825,7 @@ module.exports = {
 			expyy,
 			cvv,
 			userId,
+			role,
 			amount,
 			month_freq,
 			day_of_month,
@@ -1841,7 +1842,7 @@ module.exports = {
 		const day = String(today.getDate()).padStart(2, '0');
 		const formattedDate = `${year}${month}${day}`;
 
-		const existingUser = await userModel.findById(userId);
+		const existingUser = role === 'business' ? BusinessUser.findById(userId) : await userModel.findById(userId);
 
 		if (!existingUser) {
 			return res.status(404).send('User not found');

@@ -50,6 +50,8 @@ module.exports = {
 				video: [],
 				owner_name: userExist.username,
 				ownerId: userExist._id,
+				location: JSON.parse(location),
+				geometry: JSON.parse(geometry)
 			};
 
 			console.log(updateData);

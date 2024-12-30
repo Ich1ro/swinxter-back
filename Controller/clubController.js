@@ -3,28 +3,30 @@ const mongoose = require('mongoose');
 const userModel = require('../Model/usersModel');
 const nodemailer = require('nodemailer');
 const Mailsend = require('../helper/mail');
+const BusinessUser = require('../Model/businessUsersModel')
 
 module.exports = {
 	async create_club(req, res) {
 		const {
-			clubname,
-			ownerId,
-			location,
+			business_name,
+			business_type,
 			description,
-			clubtype,
-			introduction,
-			contact,
 			website,
 			email,
+			contact,
+			introduction,
+			ownerId,
+			location,
+			geometry,
 		} = req.body;
 		try {
-			if (!clubname) {
+			if (!business_name) {
 				return res.status(400).send('Clubname is required');
 			}
-			if (!clubtype) {
+			if (!business_type) {
 				return res.status(400).send('Clubtype is required');
 			}
-			const userExist = await userModel.findOne({ _id: ownerId });
+			const userExist = await BusinessUser.findOne({ _id: ownerId });
 			if (!userExist) {
 				return res.status(400).send('user not exist');
 			}
@@ -32,28 +34,32 @@ module.exports = {
 			var mainImage;
 			if (req.files && req.files['mainImage']) {
 				for (const uploadedImage of req.files['mainImage']) {
-					mainImage = process.env.Backend_URL_Image + uploadedImage.filename;
+					const imageUrl = await S3Manager.put('users', uploadedImage);
+					mainImage = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
 				}
 			}
+
 			let image = [];
 			let video = [];
-			if (req.files['image']) {
-				for (const images of req.files['image']) {
-					image.push(`${process.env.Backend_URL_Image}${images.filename}`);
-				}
-			}
-			// Check if videos were uploaded
-			if (req.files['video']) {
-				for (const videos of req.files['video']) {
-					video.push(`${process.env.Backend_URL_Image}${videos.filename}`);
-				}
-			}
+			// if (req.files['image']) {
+			// 	for (const images of req.files['image']) {
+			// 		image.push(`${process.env.Backend_URL_Image}${images.filename}`);
+			// 	}
+			// }
+			// // Check if videos were uploaded
+			// if (req.files['video']) {
+			// 	for (const videos of req.files['video']) {
+			// 		video.push(`${process.env.Backend_URL_Image}${videos.filename}`);
+			// 	}
+			// }
+
 			const t2 = JSON.parse(location);
 			const data = await clubModel.create({
 				ownerId: userExist._id,
-				clubname: clubname,
+				business_name: clubname,
 				location: t2,
-				clubtype: clubtype,
+				geometry: geometry,
+				business_type: clubtype,
 				owner_name: userExist.username,
 				image: image,
 				video: video,

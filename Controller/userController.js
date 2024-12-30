@@ -1066,10 +1066,10 @@ module.exports = {
 					if (!data) {
 						return res.status(400).send('something went wrong');
 					} else {
-						let html = welcome_user(exist.username);
+						let html = welcome_user(businessExist.username);
 						let mailOptions = {
 							from: process.env.Nodemailer_id,
-							to: exist.email,
+							to: businessExist.email,
 							subject: 'Welcome to Swinxter.com',
 							html: html,
 						};

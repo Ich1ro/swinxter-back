@@ -90,7 +90,7 @@ module.exports = {
 				Mailsend(req, res, mailOptions);
 				return res
 					.status(201)
-					.json({ message: 'Business request submitted for approval.' });
+					.json({ message: 'Business request submitted for approval.', email: userExist.email });
 			}
 		} catch (error) {
 			console.log(error);

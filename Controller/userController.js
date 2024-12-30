@@ -194,7 +194,11 @@ module.exports = {
 					return res.status(400).send('Your password is wrong');
 				} else {
 					const token = jwt.sign(
-						{ _id: businessExist._id, email: businessExist.email, role: businessExist.role },
+						{
+							_id: businessExist._id,
+							email: businessExist.email,
+							role: businessExist.role,
+						},
 						SECRET_KEY,
 						{
 							expiresIn: '10d',
@@ -309,7 +313,12 @@ module.exports = {
 			if (findUser_Status.isLogged) {
 				return res.status(200).send(findUser_Status);
 			} else {
-				return res.status(403).send({ message: 'You have to login first!' });
+				const businessUser = await BusinessUser.findById(req.user._id);
+				if (businessUser.isLogged) {
+					return res.status(200).send(businessUser);
+				} else {
+					return res.status(403).send({ message: 'You have to login first!' });
+				}
 			}
 		} catch (err) {
 			console.log(err, 'NOW');

@@ -177,7 +177,45 @@ module.exports = {
 				: await userModel.findOne({ username: identifier });
 
 			if (!exist) {
-				return res.status(400).send("User doesn't exist");
+				const businessExist = isEmail
+					? await userModel.findOne({ email: identifier })
+					: await userModel.findOne({ username: identifier });
+
+				if (!businessExist) {
+					return res.status(400).send("User doesn't exist");
+				}
+
+				if (!businessExist.isVerify) {
+					return res.status(400).send('Email is not verified');
+				}
+
+				const match = await bcrypt.compare(password, businessExist.password);
+				if (!match) {
+					return res.status(400).send('Your password is wrong');
+				} else {
+					const token = jwt.sign(
+						{ _id: businessExist._id, email: businessExist.email, role: businessExist.role },
+						SECRET_KEY,
+						{
+							expiresIn: '10d',
+						}
+					);
+					const stream_id = businessExist._id.toString();
+					const stream_token = serverClient.createToken(stream_id);
+					businessExist.stream_token = stream_token;
+					businessExist.isLogged = true;
+					await businessExist.save();
+					const options = {
+						expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+						httpOnly: true,
+						sameSite: 'none',
+						secure: true,
+					};
+					return res
+						.status(200)
+						.cookie('token', token, options)
+						.send({ data: businessExist, token: token });
+				}
 			}
 			if (!exist.isVerify) {
 				return res.status(400).send('Email is not verified');

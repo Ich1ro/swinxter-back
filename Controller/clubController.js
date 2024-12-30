@@ -50,6 +50,9 @@ module.exports = {
 				owner_name: userExist.username,
 				ownerId: userExist._id,
 			};
+
+			console.log(updateData);
+			
 			// if (req.files['image']) {
 			// 	for (const images of req.files['image']) {
 			// 		image.push(`${process.env.Backend_URL_Image}${images.filename}`);

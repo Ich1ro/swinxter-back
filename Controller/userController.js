@@ -178,8 +178,8 @@ module.exports = {
 
 			if (!exist) {
 				const businessExist = isEmail
-					? await userModel.findOne({ email: identifier })
-					: await userModel.findOne({ username: identifier });
+					? await BusinessUser.findOne({ email: identifier })
+					: await BusinessUser.findOne({ username: identifier });
 
 				if (!businessExist) {
 					return res.status(400).send("User doesn't exist");

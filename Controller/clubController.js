@@ -78,19 +78,19 @@ module.exports = {
 				const mailOptions = {
 					from: process.env.Nodemailer_id,
 					to: process.env.Nodemailer_admin,
-					subject: 'New Club Created',
+					subject: 'New Business Created',
 					html: `<h4>
           Dear Admin,
-          A new club request has been submitted for approval. The club name is ${clubname}.
+          A new Business request has been submitted for approval. The Business name is ${business_name}.
           Please review the request and take appropriate action.
           Best regards,
-          The Club Management Team</h4>`,
+          The Business Management Team</h4>`,
 				};
 				console.log('Notification email sent to admin');
 				Mailsend(req, res, mailOptions);
 				return res
 					.status(201)
-					.json({ message: 'Club request submitted for approval.' });
+					.json({ message: 'Business request submitted for approval.' });
 			}
 		} catch (error) {
 			console.log(error);

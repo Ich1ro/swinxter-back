@@ -4,6 +4,7 @@ const userModel = require('../Model/usersModel');
 const nodemailer = require('nodemailer');
 const Mailsend = require('../helper/mail');
 const BusinessUser = require('../Model/businessUsersModel')
+const { S3Manager } = require('../utils/s3')
 
 module.exports = {
 	async create_club(req, res) {

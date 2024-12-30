@@ -38,8 +38,7 @@ module.exports = {
 				if (
 					!profile_type ||
 					!email ||
-					!username ||
-					(profile_type === 'business' && (!firstName || !lastName))
+					!username
 				) {
 					return res
 						.status(400)
@@ -68,8 +67,6 @@ module.exports = {
 						profile_type,
 						email,
 						username,
-						firstName,
-						lastName,
 						password: hash_password,
 					});
 				} else {

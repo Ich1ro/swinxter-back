@@ -6,8 +6,8 @@ const BusinessUserSchema = new mongoose.Schema(
 			type: String,
 			default: 'business'
 		},
-		firstName: { type: String },
-		lastName: { type: String },
+		// firstName: { type: String },
+		// lastName: { type: String },
 		email: { type: String, unique: true },
 		username: { type: String, unique: true },
 		password: { type: String },

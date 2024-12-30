@@ -20,7 +20,7 @@ const axios = require('axios');
 const { URLSearchParams } = require('url');
 const { S3Manager } = require('../utils/s3');
 const { info } = require('console');
-const BusinessUser = require('../Model/businessUsersModel')
+const BusinessUser = require('../Model/businessUsersModel');
 
 module.exports = {
 	async signup(req, res) {
@@ -36,11 +36,7 @@ module.exports = {
 
 		try {
 			if (!logintype) {
-				if (
-					!profile_type ||
-					!email ||
-					!username
-				) {
+				if (!profile_type || !email || !username) {
 					return res
 						.status(400)
 						.send('Please provide all the required information.');
@@ -938,9 +934,12 @@ module.exports = {
 			const { id } = req.params;
 			const data = await userModel.findById({ _id: id });
 			if (!data) {
-				return res.status(400).send('something went wrong');
-			} else {
-				return res.status(200).send(data.isVerify);
+				const business = await BusinessUser.findById({ _id: id });
+				if (!business) {
+					return res.status(400).send('something went wrong');
+				} else {
+					return res.status(200).send(data.isVerify);
+				}
 			}
 		} catch (e) {
 			console.log(e);
@@ -1051,7 +1050,33 @@ module.exports = {
 		try {
 			const exist = await userModel.findOne({ _id: req.params.id });
 			if (!exist) {
-				return res.status(404).send('user not exist');
+				const businessExist = await BusinessUser.findOne({
+					_id: req.params.id,
+				});
+
+				if (!businessExist) {
+					return res.status(404).send('user not exist');
+				} else {
+					const data = await BusinessUser.findOneAndUpdate(
+						{ _id: req.params.id },
+						{ isVerify: true },
+						{ new: true }
+					);
+
+					if (!data) {
+						return res.status(400).send('something went wrong');
+					} else {
+						let html = welcome_user(exist.username);
+						let mailOptions = {
+							from: process.env.Nodemailer_id,
+							to: exist.email,
+							subject: 'Welcome to Swinxter.com',
+							html: html,
+						};
+						Mailsend(req, res, mailOptions);
+						return res.status(200).send('user verify successfully');
+					}
+				}
 			}
 			const createdAt = exist.createdAt;
 			const currentTime = new Date();

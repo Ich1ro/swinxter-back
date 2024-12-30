@@ -310,15 +310,16 @@ module.exports = {
 	async userLoggedIN(req, res) {
 		try {
 			const findUser_Status = await userModel.findById(req.user._id);
-			if (findUser_Status.isLogged) {
-				return res.status(200).send(findUser_Status);
-			} else {
+			if(!findUser_Status) {
 				const businessUser = await BusinessUser.findById(req.user._id);
 				if (businessUser.isLogged) {
 					return res.status(200).send(businessUser);
 				} else {
 					return res.status(403).send({ message: 'You have to login first!' });
 				}
+			}
+			if (findUser_Status.isLogged) {
+				return res.status(200).send(findUser_Status);
 			}
 		} catch (err) {
 			console.log(err, 'NOW');

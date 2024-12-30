@@ -310,7 +310,7 @@ module.exports = {
 	async userLoggedIN(req, res) {
 		try {
 			const findUser_Status = await userModel.findById(req.user._id);
-			if(!findUser_Status) {
+			if (!findUser_Status) {
 				const businessUser = await BusinessUser.findById(req.user._id);
 				if (businessUser.isLogged) {
 					return res.status(200).send(businessUser);
@@ -804,7 +804,15 @@ module.exports = {
 			// user.lastNotificationCount = notificationCount;
 			// user.save();
 			if (!data) {
-				return res.status(404).send({ message: 'User not found' });
+				const business = BusinessUser.findOneAndUpdate(
+					{ _id: req.params.id },
+					{ token: null, isLogged: false },
+					{ new: true }
+				);
+
+				if (!business) {
+					return res.status(404).send({ message: 'User not found' });
+				}
 			}
 			return res.status(200).send({ message: 'Logout successful' });
 		} catch (e) {

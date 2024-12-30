@@ -23,7 +23,8 @@ const BusinessUserSchema = new mongoose.Schema(
 		paymentUser: { type: String },
 		isVerify: { type: Boolean, default: false },
 		isLogged: { type: Boolean, default: false },
-		role: {type: String, default: 'business'}
+		role: {type: String, default: 'business'},
+		stream_token: { type: String },
 	},
 	{
 		timestamps: true,

@@ -25,6 +25,7 @@ const ClubSchema = new mongoose.Schema(
 			state: { type: String },
 			city: { type: String },
 			country: { type: String },
+			address: { type: String }
 		},
 		geometry: GeoSchema,
 		description: {

@@ -804,7 +804,7 @@ module.exports = {
 			// user.lastNotificationCount = notificationCount;
 			// user.save();
 			if (!data) {
-				const business = BusinessUser.findOneAndUpdate(
+				const business = await BusinessUser.findOneAndUpdate(
 					{ _id: req.params.id },
 					{ token: null, isLogged: false },
 					{ new: true }

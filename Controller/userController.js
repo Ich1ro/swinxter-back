@@ -1411,7 +1411,7 @@ module.exports = {
 			const visitedUsers = await userModel.find({ _id: { $in: visitedUserIds } });
 	
 			if (!visitedUsers.length) {
-				return res.status(404).send({ message: 'No users found' });
+				return res.status(200).send({ message: 'No users found' });
 			}
 	
 			res.status(200).send(visitedUsers);

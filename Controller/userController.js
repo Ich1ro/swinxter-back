@@ -1400,18 +1400,26 @@ module.exports = {
 		}
 	},
 	async visitedUsers(req, res, next) {
-		const { visitedUserIds } = req.body;
-		console.log(visitedUserIds);
-		let visitedUsers = [];
-		visitedUserIds?.map(async id => {
-			const data = await userModel.findById({ _id: id });
-			if (!data) {
-				return res.status(400).send('something went wrong');
-			} else {
-				visitedUsers.push(data);
+		try {
+			const { visitedUserIds } = req.body;
+	
+			if (!visitedUserIds || !Array.isArray(visitedUserIds)) {
+				return res.status(400).send({ message: 'Invalid input' });
 			}
+	
+			// Получаем всех пользователей по массиву ID за один запрос
+			const visitedUsers = await userModel.find({ _id: { $in: visitedUserIds } });
+	
+			if (!visitedUsers.length) {
+				return res.status(404).send({ message: 'No users found' });
+			}
+	
 			res.status(200).send(visitedUsers);
-		});
+		} catch (error) {
+			console.error('Error fetching visited users:', error);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	
 	},
 	async removeFriend(req, res, next) {
 		const { id } = req.params;
@@ -1751,7 +1759,7 @@ module.exports = {
 				return res.status(404).send({ message: 'User not found' });
 			}
 		
-			if (!user.viewedMe.includes(visitorId)) {
+			if (visitorId && !user.viewedMe.includes(visitorId)) {
 				user.viewedMe.push(visitorId);
 				await user.save();
 			}

@@ -1741,6 +1741,27 @@ module.exports = {
 			return res.status(500).send(e);
 		}
 	},
+	async add_visitors(req, res) {
+		try {
+			const profileId = req.params.id;
+			const { visitorId } = req.body;
+	
+			const user = await userModel.findById(profileId);
+			if (!user) {
+				return res.status(404).send({ message: 'User not found' });
+			}
+		
+			if (!user.viewedMe.includes(visitorId)) {
+				user.viewedMe.push(visitorId);
+				await user.save();
+			}
+	
+			res.status(200).send({ message: 'Visitor added successfully' });
+		} catch (error) {
+			console.error('Error adding visitor:', error);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
 	async sendNotification(req, res) {
 		const { senderId, recieverId, senderName, recieverName, type, message } =
 			req.body;

@@ -48,6 +48,7 @@ const UserSchema = new mongoose.Schema(
 		lastNotificationCount: { type: Number },
 		friends: { type: Array },
 		sent_requests: { type: Array },
+		viewedMe: { type: Array },
 		friend_requests: { type: Array },
 		blocked_users: { type: Array },
 		blockedby: { type: Array },

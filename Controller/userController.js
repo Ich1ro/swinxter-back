@@ -763,6 +763,20 @@ module.exports = {
 	},
 	async delete_user(req, res) {
 		try {
+			const user = await userModel.findById(req.params.id);
+
+			if (!user) {
+				const businessUser = await BusinessUser.findById(req.params.id);
+
+				
+				if (!businessUser) {
+					return res.status(404).send({ message: 'User not found' });
+				}
+				await BusinessUser.findOneAndDelete({ _id: req.params.id });
+				const updatedUsers = await BusinessUser.find();
+				return res.status(200).send(updatedUsers);
+			}
+
 			await userModel.findOneAndDelete({ _id: req.params.id });
 			const updatedUsers = await userModel.find();
 			return res.status(200).send(updatedUsers);
@@ -1842,7 +1856,10 @@ module.exports = {
 		const day = String(today.getDate()).padStart(2, '0');
 		const formattedDate = `${year}${month}${day}`;
 
-		const existingUser = role === 'business' ? await BusinessUser.findById(userId) : await userModel.findById(userId);
+		const existingUser =
+			role === 'business'
+				? await BusinessUser.findById(userId)
+				: await userModel.findById(userId);
 
 		if (!existingUser) {
 			return res.status(404).send('User not found');

@@ -21,6 +21,7 @@ const { URLSearchParams } = require('url');
 const { S3Manager } = require('../utils/s3');
 const { info } = require('console');
 const BusinessUser = require('../Model/businessUsersModel');
+const Notification = require('../Model/notificationModel')
 
 module.exports = {
 	async signup(req, res) {
@@ -835,7 +836,7 @@ module.exports = {
 						await user.save();
 					}
 				}
-				
+
 				return res.status(200).send({ message: 'Logout successful' });
 			}
 

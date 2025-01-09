@@ -768,7 +768,6 @@ module.exports = {
 			if (!user) {
 				const businessUser = await BusinessUser.findById(req.params.id);
 
-				
 				if (!businessUser) {
 					return res.status(404).send({ message: 'User not found' });
 				}
@@ -808,29 +807,51 @@ module.exports = {
 	},
 	async logout(req, res) {
 		try {
-			const data = await userModel.findOneAndUpdate(
+			const user = await userModel.findOneAndUpdate(
 				{ _id: req.params.id },
 				{ token: null, isLogged: false },
 				{ new: true }
 			);
-			// const user = await userModel.findById(req.params.id);
-			// let notificationCount = user.notifications.length;
-			// user.lastNotificationCount = notificationCount;
-			// user.save();
-			if (!data) {
-				const business = await BusinessUser.findOneAndUpdate(
-					{ _id: req.params.id },
-					{ token: null, isLogged: false },
-					{ new: true }
-				);
 
-				if (!business) {
-					return res.status(404).send({ message: 'User not found' });
+			if (user) {
+				const notificationIds = user.notifications;
+
+				if (notificationIds.length > 0) {
+					const notifications = await Notification.find({
+						_id: { $in: notificationIds },
+					});
+
+					const readNotifications = notifications.filter(n => n.read === true);
+
+					if (readNotifications.length > 0) {
+						const readNotificationIds = readNotifications.map(n => n._id);
+						await Notification.deleteMany({
+							_id: { $in: readNotificationIds },
+						});
+
+						user.notifications = user.notifications.filter(
+							id => !readNotificationIds.includes(id.toString())
+						);
+						await user.save();
+					}
 				}
+				
+				return res.status(200).send({ message: 'Logout successful' });
 			}
+
+			const business = await BusinessUser.findOneAndUpdate(
+				{ _id: req.params.id },
+				{ token: null, isLogged: false },
+				{ new: true }
+			);
+
+			if (!business) {
+				return res.status(404).send({ message: 'User not found' });
+			}
+
 			return res.status(200).send({ message: 'Logout successful' });
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 			return res.status(500).send(e);
 		}
 	},
@@ -1402,24 +1423,25 @@ module.exports = {
 	async visitedUsers(req, res, next) {
 		try {
 			const { visitedUserIds } = req.body;
-	
+
 			if (!visitedUserIds || !Array.isArray(visitedUserIds)) {
 				return res.status(400).send({ message: 'Invalid input' });
 			}
-	
+
 			// Получаем всех пользователей по массиву ID за один запрос
-			const visitedUsers = await userModel.find({ _id: { $in: visitedUserIds } });
-	
+			const visitedUsers = await userModel.find({
+				_id: { $in: visitedUserIds },
+			});
+
 			if (!visitedUsers.length) {
 				return res.status(200).send({ message: 'No users found' });
 			}
-	
+
 			res.status(200).send(visitedUsers);
 		} catch (error) {
 			console.error('Error fetching visited users:', error);
 			res.status(500).send({ message: 'Internal server error' });
 		}
-	
 	},
 	async removeFriend(req, res, next) {
 		const { id } = req.params;
@@ -1753,17 +1775,17 @@ module.exports = {
 		try {
 			const profileId = req.params.id;
 			const { visitorId } = req.body;
-	
+
 			const user = await userModel.findById(profileId);
 			if (!user) {
 				return res.status(404).send({ message: 'User not found' });
 			}
-		
+
 			if (visitorId && !user.viewedMe.includes(visitorId)) {
 				user.viewedMe.push(visitorId);
 				await user.save();
 			}
-	
+
 			res.status(200).send({ message: 'Visitor added successfully' });
 		} catch (error) {
 			console.error('Error adding visitor:', error);

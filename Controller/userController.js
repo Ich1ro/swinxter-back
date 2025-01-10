@@ -607,6 +607,42 @@ module.exports = {
 			return res.status(500).send(error.message);
 		}
 	},
+	async delete_video(req, res) {
+		const { userId } = req.params;
+		const { videoId } = req.body;
+
+		try {
+			if (!userId) {
+				return res.status(400).send('userId is required');
+			}
+
+			const user = await userModel.findById(userId);
+			if (!user) {
+				return res.status(404).send("User doesn't exist");
+			}
+
+			const videoIndex = user.videos.findIndex(
+				media => media._id.toString() === videoId
+			);
+			if (videoIndex === -1) {
+				return res.status(404).send("Media doesn't exist");
+			}
+
+			const media = user.videos[videoIndex];
+			const s3Key = media.video.split('.amazonaws.com/')[1];
+
+			await S3Manager.delete(s3Key);
+
+			user.videos.splice(videoIndex, 1);
+
+			await user.save();
+
+			return res.status(200).send({ message: 'Media deleted successfully' });
+		} catch (error) {
+			console.error(error);
+			return res.status(500).send(error.message);
+		}
+	},
 
 	async update(req, res) {
 		try {

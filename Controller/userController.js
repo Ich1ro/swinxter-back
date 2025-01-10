@@ -21,7 +21,7 @@ const { URLSearchParams } = require('url');
 const { S3Manager } = require('../utils/s3');
 const { info } = require('console');
 const BusinessUser = require('../Model/businessUsersModel');
-const Notification = require('../Model/notificationModel')
+const Notification = require('../Model/notificationModel');
 
 module.exports = {
 	async signup(req, res) {
@@ -566,6 +566,30 @@ module.exports = {
 			}
 
 			return res.status(200).send(updatedUser);
+		} catch (error) {
+			console.error(error);
+			return res.status(500).send(error.message);
+		}
+	},
+	async update_media(req, res) {
+		const { userId, type } = req.params;
+		const { media } = req.body;
+
+		try {
+			if (!userId) {
+				return res.status(400).send('userId is required');
+			}
+
+			const user = await userModel.findById(userId);
+			if (!user) {
+				return res.status(404).send("User doesn't exist");
+			}
+
+			type === 'media' ? (user.mymedia = media) : (user.videos = media);
+
+			await user.save();
+
+			return res.status(200).send({ message: 'Media deleted successfully' });
 		} catch (error) {
 			console.error(error);
 			return res.status(500).send(error.message);

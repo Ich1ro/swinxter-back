@@ -103,6 +103,7 @@ router.put(
 
 router.post('/delete_media/:userId', user.delete_media);
 router.post('/delete_video/:userId', user.delete_video);
+router.post('/update_media/:userId/:type', user.update_media);
 
 router.post('/addwallet/:id', verifyUser, user.addwallet);
 router.get('/getfavModel/:userId', user.getfavModel);

@@ -1,5 +1,6 @@
 const replyModel = require('../Model/reply');
 const eventModel = require('../Model/event');
+const userModel = require('../Model/usersModel');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Mailsend = require('../helper/mail');
 const nodemailer = require('nodemailer');
@@ -30,7 +31,11 @@ module.exports = {
 			var mainImage;
 			if (req.files && req.files['mainImage']) {
 				for (const uploadedImage of req.files['mainImage']) {
-					mainImage = process.env.Backend_URL_Image + uploadedImage.filename;
+					const imageUrl = await S3Manager.put(
+						`event_${eventName}`,
+						uploadedImage
+					);
+					mainImage = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
 				}
 			}
 			console.log(req.files, 'ALL FILES');
@@ -38,12 +43,18 @@ module.exports = {
 			let videos = [];
 			if (req.files['images']) {
 				for (const image of req.files['images']) {
-					images.push(`${process.env.Backend_URL_Image}${image.filename}`);
+					const imageUrl = await S3Manager.put(`event_${eventName}`, image);
+					images.push(
+						`https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`
+					);
 				}
 			}
 			if (req.files['videos']) {
 				for (const video of req.files['videos']) {
-					videos.push(`${process.env.Backend_URL_Image}${video.filename}`);
+					const imageUrl = await S3Manager.put(`event_${eventName}`, video);
+					videos.push(
+						`https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`
+					);
 				}
 			}
 			const t = JSON.parse(accepted_type);
@@ -209,6 +220,29 @@ module.exports = {
 				return res.status(400).send('something went wrong');
 			} else {
 				return res.status(200).send(data);
+			}
+		} catch (e) {
+			console.log(e);
+			return res.status(500).send(e);
+		}
+	},
+	async get_participants_by_eventId(req, res) {
+		try {
+			const { eventId } = req.params;
+			const data = await eventModel.findById({ _id: eventId });
+
+			if (data) {
+				if (data.participants.length !== 0) {
+					const usersIds = data.participants.map(
+						participant => participant.user
+					);
+					const users = await userModel.find({ _id: { $in: usersIds } });
+					return res.status(200).send(users);
+				} else {
+					return res.status(200).send([]);
+				}
+			} else {
+				return res.status(400).send('something went wrong');
 			}
 		} catch (e) {
 			console.log(e);

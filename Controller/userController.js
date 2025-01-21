@@ -408,15 +408,17 @@ module.exports = {
 			// Check if images were uploaded
 			if (req.files && req.files['images']) {
 				for (const uploadedImage of req.files['images']) {
+					const imageUrl = await S3Manager.put('users', uploadedImage);
 					images.push(
-						`${process.env.Backend_URL_Image}${uploadedImage.filename}`
+						`https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`
 					);
 				}
 			}
 			if (req.files && req.files['videos']) {
 				for (const uploadedvideos of req.files['videos']) {
+					const imageUrl = await S3Manager.put('users', uploadedvideos);
 					videos.push(
-						`${process.env.Backend_URL_Image}${uploadedvideos.filename}`
+						`https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`
 					);
 				}
 			}
@@ -585,11 +587,11 @@ module.exports = {
 				return res.status(404).send("User doesn't exist");
 			}
 
-			type === 'media' ? (user.mymedia = media) : (user.videos = media);
+			type === 'media' ? (user.mymedia = [...user.mymedia, ...media]) : (user.videos = [...user.videos, ...media]);
 
 			await user.save();
 
-			return res.status(200).send({ message: 'Media deleted successfully' });
+			return res.status(200).send({ message: 'Media updated successfully' });
 		} catch (error) {
 			console.error(error);
 			return res.status(500).send(error.message);
@@ -1612,7 +1614,7 @@ module.exports = {
 				geometry: {
 					$near: {
 						$geometry: { type: 'Point', coordinates: [+lon, +lat] },
-						$maxDistance: +radius || 250000,
+						$maxDistance: +radius,
 					},
 				},
 			});

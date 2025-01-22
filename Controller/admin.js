@@ -71,7 +71,7 @@ module.exports = {
   async updateAdmin(req, res) {
     try {
       const { id } = req.params;
-      const updateData = req.body.data;
+      const updateData = req.body.data.data;
   
       const updatedAdmin = await adminUser.findByIdAndUpdate(id, updateData, {
         new: true,

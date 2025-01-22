@@ -755,7 +755,7 @@ module.exports = {
 			  membership_price,
 			  membership_expiry,
 			  membership_pause,
-			} = req.body;
+			} = req.body.data;
 		
 			if (!userId) {
 			  return res.status(400).send({ message: 'User ID is required' });

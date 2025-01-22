@@ -68,6 +68,25 @@ module.exports = {
       return res.status(500).send(e);
     }
   },
+  async updateAdmin(req, res) {
+    try {
+      const { id } = req.params;
+      const updateData = req.body.data;
+  
+      const updatedAdmin = await adminUser.findByIdAndUpdate(id, updateData, {
+        new: true,
+      });
+  
+      if (!updatedAdmin) {
+        return res.status(404).send({ message: "Admin not found" });
+      }
+  
+      return res.status(200).send(updatedAdmin);
+    } catch (e) {
+      return res.status(500).send({ message: "Error updating admin", error: e });
+    }
+  },
+  
   async deleteUsers(req,res){
     try {
       const data = await adminUser.findOneAndDelete({ _id: req.params.id });

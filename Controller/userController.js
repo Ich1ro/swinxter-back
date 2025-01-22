@@ -746,6 +746,47 @@ module.exports = {
 			return res.status(500).send(e);
 		}
 	},
+	async updateUserMembership(req, res) {
+		try {
+			const { userId } = req.params;
+			const {
+			  membership,
+			  membership_plan,
+			  membership_price,
+			  membership_expiry,
+			  membership_pause,
+			} = req.body;
+		
+			if (!userId) {
+			  return res.status(400).send({ message: 'User ID is required' });
+			}
+		
+			const updatedUser = await User.findByIdAndUpdate(
+			  userId,
+			  {
+				$set: {
+				  'payment.membership': membership,
+				  'payment.membership_plan': membership_plan,
+				  'payment.membership_price': membership_price,
+				  'payment.membership_expiry': membership_expiry,
+				  'payment.membership_pause': membership_pause,
+				},
+			  },
+			  { new: true }
+			);
+
+			console.log(updatedUser);
+			
+			if (!updatedUser) {
+			  return res.status(404).send({ message: 'User not found' });
+			}
+
+			res.status(200).send({ message: 'Membership updated successfully', user: updatedUser });
+		  } catch (error) {
+			console.error('Error updating membership:', error);
+			res.status(500).send({ message: 'Internal server error', error });
+		  }
+	},
 	async createUserInfo(req, res) {
 		try {
 			// let jsonData = {};

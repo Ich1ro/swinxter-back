@@ -64,6 +64,10 @@ router.put(
 	]),
 	userController.update
 );
+router.post(
+	'/update-user-membership/:userId',
+	userController.updateUserMembership
+);
 router.delete('/delete_user/:id', user.delete_user);
 router.get('/search_user', user.search_user);
 router.post('/logout/:id', user.logout);

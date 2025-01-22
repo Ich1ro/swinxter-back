@@ -760,8 +760,8 @@ module.exports = {
 			if (!userId) {
 			  return res.status(400).send({ message: 'User ID is required' });
 			}
-		
-			const updatedUser = await User.findByIdAndUpdate(
+	
+			const updatedUser = await userModel.findByIdAndUpdate(
 			  userId,
 			  {
 				$set: {

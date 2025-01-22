@@ -4,6 +4,7 @@ const userModel = require('../Model/usersModel');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Mailsend = require('../helper/mail');
 const nodemailer = require('nodemailer');
+const { S3Manager } = require('../utils/s3')
 module.exports = {
 	async createEvent(req, res) {
 		try {

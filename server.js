@@ -18,6 +18,7 @@ const travel = require('./Routes/travel');
 const affiliate = require('./Routes/affiliateRoutes');
 const faq = require('./Routes/faq');
 const adminRoutes = require('./Routes/adminRoutes');
+const resort = require('./Routes/resort')
 app.use(express.json());
 var corsOptions = {
 	origin: [
@@ -37,7 +38,7 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use('/api', userroutes, event, travel, clubroutes, faq, affiliate);
+app.use('/api', userroutes, event, travel, clubroutes, faq, affiliate, resort);
 app.use('/admin', adminRoutes);
 db();
 app.use(express.static(path.join(__dirname)));

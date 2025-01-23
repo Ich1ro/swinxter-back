@@ -14,6 +14,20 @@ module.exports = {
 			return res.status(500).send(e);
 		}
 	},
+	async get_resort_by_id(req, res) {
+		try {
+			const { id } = req.params;
+			const data = await resort.findById(id);
+			if (!data) {
+				return res.status(400).send('something went wrong');
+			} else {
+				return res.status(200).send(data);
+			}
+		} catch (e) {
+			console.log(e);
+			return res.status(500).send(e);
+		}
+	},
 	async create_resort(req, res) {
 		const { data } = req.body;
 		try {

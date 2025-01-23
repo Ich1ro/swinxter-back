@@ -104,8 +104,8 @@ io.on('connection', socket => {
 		}
 	);
 
-	// socket.on('disconnect', () => {
-	// 	removeUser(socket.id);
-	// 	console.log('Disconnected from socket.io');
-	// });
+	socket.on('disconnect', () => {
+		removeUser(socket.id);
+		console.log(`User disconnected. Current online users:`, onlineUser);
+	});
 });

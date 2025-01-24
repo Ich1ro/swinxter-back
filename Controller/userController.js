@@ -587,7 +587,9 @@ module.exports = {
 				return res.status(404).send("User doesn't exist");
 			}
 
-			type === 'media' ? (user.mymedia = [...user.mymedia, ...media]) : (user.videos = [...user.videos, ...media]);
+			type === 'media'
+				? (user.mymedia = [...user.mymedia, ...media])
+				: (user.videos = [...user.videos, ...media]);
 
 			await user.save();
 
@@ -750,42 +752,45 @@ module.exports = {
 		try {
 			const { userId } = req.params;
 			const {
-			  membership,
-			  membership_plan,
-			  membership_price,
-			  membership_expiry,
-			  membership_pause,
+				membership,
+				membership_plan,
+				membership_price,
+				membership_expiry,
+				membership_pause,
 			} = req.body.data;
-		
+
 			if (!userId) {
-			  return res.status(400).send({ message: 'User ID is required' });
+				return res.status(400).send({ message: 'User ID is required' });
 			}
-	
+
 			const updatedUser = await userModel.findByIdAndUpdate(
-			  userId,
-			  {
-				$set: {
-				  'payment.membership': membership,
-				  'payment.membership_plan': membership_plan,
-				  'payment.membership_price': membership_price,
-				  'payment.membership_expiry': membership_expiry,
-				  'payment.membership_pause': membership_pause,
+				userId,
+				{
+					$set: {
+						'payment.membership': membership,
+						'payment.membership_plan': membership_plan,
+						'payment.membership_price': membership_price,
+						'payment.membership_expiry': membership_expiry,
+						'payment.membership_pause': membership_pause,
+					},
 				},
-			  },
-			  { new: true }
+				{ new: true }
 			);
 
 			console.log(updatedUser);
-			
+
 			if (!updatedUser) {
-			  return res.status(404).send({ message: 'User not found' });
+				return res.status(404).send({ message: 'User not found' });
 			}
 
-			res.status(200).send({ message: 'Membership updated successfully', user: updatedUser });
-		  } catch (error) {
+			res.status(200).send({
+				message: 'Membership updated successfully',
+				user: updatedUser,
+			});
+		} catch (error) {
 			console.error('Error updating membership:', error);
 			res.status(500).send({ message: 'Internal server error', error });
-		  }
+		}
 	},
 	async createUserInfo(req, res) {
 		try {
@@ -956,6 +961,33 @@ module.exports = {
 			return res.status(200).send({ message: 'Logout successful' });
 		} catch (e) {
 			console.error(e);
+			return res.status(500).send(e);
+		}
+	},
+	async delete_notification(req, res) {
+		try {
+			const user = await userModel.findOneAndUpdate(
+				{ _id: req.params.id },
+				{ token: null, isLogged: false },
+				{ new: true }
+			);
+
+			if (user) {
+				const notificationId = req.body.notification_id;
+
+				await Notification.findByIdAndDelete({
+					_id: notificationId,
+				});
+
+				user.notifications = user.notifications.filter(
+					id => id !== notificationId
+				);
+				await user.save();
+
+				return res.status(200).send({ message: 'Logout successful' });
+			}
+		} catch (e) {
+			console.log(e);
 			return res.status(500).send(e);
 		}
 	},

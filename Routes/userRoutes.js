@@ -126,6 +126,7 @@ router.post('/auth/getstream', async (req, res) => {
 	}
 });
 router.post('/visited-users', userController.visitedUsers);
+router.post('/delete_notification/:id', userController.delete_notification);
 router.get('/zego_token', userController.zegoToken);
 router.get('/user_details/:id', userController.userdetail);
 router.get('/recentusers', userController.RecentUsers);

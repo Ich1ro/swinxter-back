@@ -589,11 +589,14 @@ module.exports = {
 
 			const targetArray = type === 'media' ? user.mymedia : user.videos;
 
-			const existingMediaIndex = targetArray.findIndex(m => m._id === media[0]._id);
+			const existingMediaIndex = targetArray.findIndex(m => m._id === media._id);
+
+			console.log(existingMediaIndex);
+			
             if (existingMediaIndex !== -1) {
-                targetArray[existingMediaIndex] = { ...targetArray[existingMediaIndex], ...media[0] };
+                targetArray[existingMediaIndex] = { ...targetArray[existingMediaIndex], ...media };
             } else {
-                targetArray.push(media[0]);
+                targetArray.push(media);
             }
         
 			await user.save();

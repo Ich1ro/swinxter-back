@@ -589,7 +589,7 @@ module.exports = {
 
 			const targetArray = type === 'media' ? user.mymedia : user.videos;
 
-			const existingMediaIndex = targetArray.findIndex(m => m._id === media._id);
+			const existingMediaIndex = targetArray.findIndex(m => m._id.toString() === media._id.toString());
 
 			console.log(existingMediaIndex);
 			

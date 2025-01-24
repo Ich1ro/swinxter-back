@@ -587,10 +587,15 @@ module.exports = {
 				return res.status(404).send("User doesn't exist");
 			}
 
-			type === 'media'
-				? (user.mymedia = [...user.mymedia, ...media])
-				: (user.videos = [...user.videos, ...media]);
+			const targetArray = type === 'media' ? user.mymedia : user.videos;
 
+			const existingMediaIndex = targetArray.findIndex(m => m._id === media._id);
+            if (existingMediaIndex !== -1) {
+                targetArray[existingMediaIndex] = { ...targetArray[existingMediaIndex], ...media };
+            } else {
+                targetArray.push(media);
+            }
+        
 			await user.save();
 
 			return res.status(200).send({ message: 'Media updated successfully' });

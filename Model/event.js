@@ -1,5 +1,13 @@
 const mongoose = require("mongoose");
 
+const GeoSchema = new Schema({
+	type: {
+		type: String,
+		enum: ['Point'],
+	},
+	coordinates: [Number]
+});
+
 const eventSchema = new mongoose.Schema({
   mainImage: {
     type: String,
@@ -11,7 +19,14 @@ const eventSchema = new mongoose.Schema({
   Startdate: { type: String },
   EndDate: { type: String },
   contact: { type: String },
-  location: Object,
+  location: {
+    region: { type: String },
+    municipality: { type: String },
+    country: { type: String },
+    address: {type: String},
+    street: {type: String}
+  },
+  geometry: GeoSchema,
   description: { type: String },
   images: [{ type: String }],
   videos: [{ type: String }],
@@ -49,11 +64,10 @@ const eventSchema = new mongoose.Schema({
       replyPhoto: String,
       replyName: String,
     }
-  ]
+  ],
 });
-
+eventSchema.index({ geometry: '2dsphere' });
 
 const event = mongoose.model("event", eventSchema);
-
 
 module.exports = event;

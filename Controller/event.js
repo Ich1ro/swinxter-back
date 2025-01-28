@@ -15,6 +15,7 @@ module.exports = {
 				EndDate,
 				accepted_type,
 				location,
+				geometry,
 				description,
 				type,
 			} = req.body;
@@ -25,6 +26,7 @@ module.exports = {
 				!EndDate,
 				!location,
 				!description,
+				!geometry,
 				!type)
 			) {
 				return res.status(400).send('Required data is missing.');
@@ -59,15 +61,15 @@ module.exports = {
 				}
 			}
 			const t = JSON.parse(accepted_type);
-			const t2 = JSON.parse(location);
-			console.log(t2);
+			console.log(t);
 			const data = await eventModel.create({
 				...req.body,
 				accepted_type: t,
 				images: images,
 				mainImage: mainImage,
 				videos: videos,
-				location: t2,
+				location: location,
+				geometry: geometry,
 				userId: req.body.userId,
 			});
 			if (!data) {

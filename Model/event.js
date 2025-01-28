@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const GeoSchema = new Schema({
+const GeoSchema = new mongoose.Schema({
 	type: {
 		type: String,
 		enum: ['Point'],

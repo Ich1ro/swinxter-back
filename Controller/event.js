@@ -68,8 +68,8 @@ module.exports = {
 				images: images,
 				mainImage: mainImage,
 				videos: videos,
-				location: location,
-				geometry: geometry,
+				location: JSON.parse(location),
+				geometry: JSON.parse(geometry),
 				userId: req.body.userId,
 			});
 			if (!data) {

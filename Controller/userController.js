@@ -812,7 +812,7 @@ module.exports = {
 				};
 			}
 	
-			const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+			const updatedUser = await userModel.findByIdAndUpdate(userId, updateData, {
 				new: true,
 			});
 	

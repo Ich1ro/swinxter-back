@@ -759,45 +759,74 @@ module.exports = {
 	async updateUserMembership(req, res) {
 		try {
 			const { userId } = req.params;
-			const {
-				membership,
-				membership_plan,
-				membership_price,
-				membership_expiry,
-				membership_pause,
-			} = req.body.data;
-
+			const { plan, pause } = req.body.data;
+	
+			const plans = {
+				"Free Plan": 0,
+				"3 Days": 3,
+				"1 Week": 7,
+				"1 Month": 30,
+				"3 Months": 90,
+				"6 Months": 180,
+				"9 Months": 270,
+				"1 Year": 365,
+			};
+	
 			if (!userId) {
-				return res.status(400).send({ message: 'User ID is required' });
+				return res.status(400).send({ message: "User ID is required." });
 			}
-
-			const updatedUser = await userModel.findByIdAndUpdate(
-				userId,
-				{
-					$set: {
-						'payment.membership': membership,
-						'payment.membership_plan': membership_plan,
-						'payment.membership_price': membership_price,
-						'payment.membership_expiry': membership_expiry,
-						'payment.membership_pause': membership_pause,
+	
+			if (plan && !plans.hasOwnProperty(plan)) {
+				return res.status(400).send({ message: "Invalid plan selected." });
+			}
+	
+			const today = new Date();
+	
+			let updateData = {};
+	
+			if (plan === "Free Plan") {
+				updateData = {
+					"payment.membership": false,
+					"payment.membership_pause": false,
+					$unset: {
+						"payment.membership_plan": "",
+						"payment.membership_expiry": "",
+						"payment.last_payment": "",
 					},
-				},
-				{ new: true }
-			);
-
-			console.log(updatedUser);
-
-			if (!updatedUser) {
-				return res.status(404).send({ message: 'User not found' });
+				};
+			} else if (pause) {
+				updateData = {
+					"payment.membership": false,
+					"payment.membership_pause": true,
+				};
+			} else {
+				const membership_expiry = new Date(today);
+				membership_expiry.setDate(membership_expiry.getDate() + plans[plan]);
+	
+				updateData = {
+					"payment.membership": true,
+					"payment.membership_plan": plan,
+					"payment.last_payment": today,
+					"payment.membership_expiry": membership_expiry.toISOString(),
+					"payment.membership_pause": false,
+				};
 			}
-
+	
+			const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+				new: true,
+			});
+	
+			if (!updatedUser) {
+				return res.status(404).send({ message: "User not found." });
+			}
+	
 			res.status(200).send({
-				message: 'Membership updated successfully',
+				message: "Membership updated successfully.",
 				user: updatedUser,
 			});
 		} catch (error) {
-			console.error('Error updating membership:', error);
-			res.status(500).send({ message: 'Internal server error', error });
+			console.error("Error updating membership:", error);
+			return res.status(500).send({ message: "Internal server error", error });
 		}
 	},
 	async createUserInfo(req, res) {

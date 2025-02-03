@@ -589,16 +589,21 @@ module.exports = {
 
 			const targetArray = type === 'media' ? user.mymedia : user.videos;
 
-			const existingMediaIndex = targetArray.findIndex(m => m._id.toString() === media._id.toString());
+			const existingMediaIndex = targetArray.findIndex(
+				m => m._id.toString() === media._id.toString()
+			);
 
 			console.log(existingMediaIndex);
-			
-            if (existingMediaIndex !== -1) {
-                targetArray[existingMediaIndex] = { ...targetArray[existingMediaIndex], ...media };
-            } else {
-                targetArray.push(media);
-            }
-        
+
+			if (existingMediaIndex !== -1) {
+				targetArray[existingMediaIndex] = {
+					...targetArray[existingMediaIndex],
+					...media,
+				};
+			} else {
+				targetArray.push(media);
+			}
+
 			await user.save();
 
 			return res.status(200).send({ message: 'Media updated successfully' });
@@ -760,73 +765,77 @@ module.exports = {
 		try {
 			const { userId } = req.params;
 			const { plan, pause } = req.body.data;
-	
+
 			const plans = {
-				"Free Plan": 0,
-				"3 Days": 3,
-				"1 Week": 7,
-				"1 Month": 30,
-				"3 Months": 90,
-				"6 Months": 180,
-				"9 Months": 270,
-				"1 Year": 365,
+				'Free Plan': 0,
+				'3 Days': 3,
+				'1 Week': 7,
+				'1 Month': 30,
+				'3 Months': 90,
+				'6 Months': 180,
+				'9 Months': 270,
+				'1 Year': 365,
 			};
-	
+
 			if (!userId) {
-				return res.status(400).send({ message: "User ID is required." });
+				return res.status(400).send({ message: 'User ID is required.' });
 			}
-	
+
 			if (plan && !plans.hasOwnProperty(plan)) {
-				return res.status(400).send({ message: "Invalid plan selected." });
+				return res.status(400).send({ message: 'Invalid plan selected.' });
 			}
-	
+
 			const today = new Date();
-	
+
 			let updateData = {};
-	
-			if (plan === "Free Plan") {
+
+			if (plan === 'Free Plan') {
 				updateData = {
-					"payment.membership": false,
-					"payment.membership_pause": false,
+					'payment.membership': false,
+					'payment.membership_pause': false,
 					$unset: {
-						"payment.membership_plan": "",
-						"payment.membership_expiry": "",
-						"payment.last_payment": "",
+						'payment.membership_plan': '',
+						'payment.membership_expiry': '',
+						'payment.last_payment': '',
 					},
 				};
 			} else if (pause) {
 				updateData = {
-					"payment.membership": false,
-					"payment.membership_pause": true,
+					'payment.membership': false,
+					'payment.membership_pause': true,
 				};
 			} else {
 				const membership_expiry = new Date(today);
 				membership_expiry.setDate(membership_expiry.getDate() + plans[plan]);
-	
+
 				updateData = {
-					"payment.membership": true,
-					"payment.membership_plan": plan,
-					"payment.last_payment": today,
-					"payment.membership_expiry": membership_expiry.toISOString(),
-					"payment.membership_pause": false,
+					'payment.membership': true,
+					'payment.membership_plan': plan,
+					'payment.last_payment': today,
+					'payment.membership_expiry': membership_expiry.toISOString(),
+					'payment.membership_pause': false,
 				};
 			}
-	
-			const updatedUser = await userModel.findByIdAndUpdate(userId, updateData, {
-				new: true,
-			});
-	
+
+			const updatedUser = await userModel.findByIdAndUpdate(
+				userId,
+				updateData,
+				{
+					new: true,
+				}
+			);
+
 			if (!updatedUser) {
-				return res.status(404).send({ message: "User not found." });
+				return res.status(404).send({ message: 'User not found.' });
 			}
-	
+
 			res.status(200).send({
-				message: "Membership updated successfully.",
+				message: 'Membership updated successfully.',
 				user: updatedUser,
 			});
 		} catch (error) {
-			console.error("Error updating membership:", error);
-			return res.status(500).send({ message: "Internal server error", error });
+			console.error('Error updating membership:', error);
+			return res.status(500).send({ message: 'Internal server error', error });
 		}
 	},
 	async createUserInfo(req, res) {
@@ -1941,25 +1950,61 @@ module.exports = {
 		}
 	},
 	async removeSuperlike(req, res) {
-		const userId = req.body.userId;
-		const superlikeId = req.body.superlikeId;
+		// const userId = req.body.userId;
+		// const superlikeId = req.body.superlikeId;
+		// try {
+		// 	const user = await userModel.findById({ _id: userId });
+		// 	if (!user) return res.status(404).send('User not found');
+
+		// 	user.superlike.sent = user.superlike.sent.filter(sl => sl.userId.toString() !== superlikeId);
+		// 	await user.save();
+
+		// 	const superlikeUser = await userModel.findById({ _id: superlikeId });
+		// 	if (!superlikeUser) return res.status(404).send('Superliked user not found');
+
+		// 	superlikeUser.superlike.recieved = superlikeUser.superlike.recieved.filter(id => id.toString() !== userId);
+		// 	await superlikeUser.save();
+
+		// 	return res.status(200).send('Superlike removed successfully');
+		// } catch (e) {
+		// 	console.error(e);
+		// 	return res.status(500).send(e);
+		// }
+
+		const { userId, superlikeId } = req.body;
+
 		try {
-			const user = await userModel.findById({ _id: userId });
-			if (!user) return res.status(404).send('User not found');
-			
-			user.superlike.sent = user.superlike.sent.filter(sl => sl.userId.toString() !== superlikeId);
+			const user = await userModel.findById(userId);
+			if (!user || !user.superlike || !Array.isArray(user.superlike.sent)) {
+				return res.status(404).send('User not found or invalid data');
+			}
+
+			user.superlike.sent = user.superlike.sent.filter(
+				sl => sl?.userId?.toString() !== superlikeId
+			);
 			await user.save();
-			
-			const superlikeUser = await userModel.findById({ _id: superlikeId });
-			if (!superlikeUser) return res.status(404).send('Superliked user not found');
-			
-			superlikeUser.superlike.recieved = superlikeUser.superlike.recieved.filter(id => id.toString() !== userId);
+
+			const superlikeUser = await userModel.findById(superlikeId);
+			if (
+				!superlikeUser ||
+				!superlikeUser.superlike ||
+				!Array.isArray(superlikeUser.superlike.recieved)
+			) {
+				return res
+					.status(404)
+					.send('Superliked user not found or invalid data');
+			}
+
+			superlikeUser.superlike.recieved =
+				superlikeUser.superlike.recieved.filter(
+					id => id?.toString() !== userId
+				);
 			await superlikeUser.save();
-			
+
 			return res.status(200).send('Superlike removed successfully');
 		} catch (e) {
 			console.error(e);
-			return res.status(500).send(e);
+			return res.status(500).send(e.message);
 		}
 	},
 	async add_visitors(req, res) {

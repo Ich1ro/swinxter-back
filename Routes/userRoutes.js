@@ -140,6 +140,7 @@ router.post('/blockuser', userController.blockUser);
 router.post('/add_visitor/:id', userController.add_visitors);
 router.post('/unblockuser', userController.unblockUser);
 router.post('/superlike', userController.superlike);
+router.post('/remove-superlike', userController.removeSuperlike);
 router.post('/notifications', userController.sendNotification);
 router.get('/notifications/:userId', userController.getNotifications);
 router.post('/get-friends', userController.getFriends);

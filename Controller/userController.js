@@ -1940,6 +1940,28 @@ module.exports = {
 			return res.status(500).send(e);
 		}
 	},
+	async removeSuperlike(req, res) {
+		const userId = req.body.userId;
+		const superlikeId = req.body.superlikeId;
+		try {
+			const user = await userModel.findById({ _id: userId });
+			if (!user) return res.status(404).send('User not found');
+			
+			user.superlike.sent = user.superlike.sent.filter(sl => sl.userId.toString() !== superlikeId);
+			await user.save();
+			
+			const superlikeUser = await userModel.findById({ _id: superlikeId });
+			if (!superlikeUser) return res.status(404).send('Superliked user not found');
+			
+			superlikeUser.superlike.recieved = superlikeUser.superlike.recieved.filter(id => id.toString() !== userId);
+			await superlikeUser.save();
+			
+			return res.status(200).send('Superlike removed successfully');
+		} catch (e) {
+			console.error(e);
+			return res.status(500).send(e);
+		}
+	},
 	async add_visitors(req, res) {
 		try {
 			const profileId = req.params.id;

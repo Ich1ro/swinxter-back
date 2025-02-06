@@ -11,7 +11,7 @@ module.exports = {
 				// age,
 				// age2,
 				name,
-				locationto,
+				// locationto,
 				userId,
 				startDate,
 				endDate,
@@ -19,13 +19,15 @@ module.exports = {
 				resort,
 				description,
 				image,
+				location,
+				geometry,
 				userInfo,
 			} = req.body;
 			if (
 				// !age,
 				// !userInfo,
 				(!name,
-				!locationto,
+				// !locationto,
 				!userId,
 				!startDate,
 				!endDate,
@@ -43,38 +45,74 @@ module.exports = {
 			if (!userExist) {
 				return res.status(400).send('user not exist');
 			}
-			const t2 = JSON.parse(locationto);
+			// const t2 = JSON.parse(locationto);
 			const t = JSON.parse(interested);
-			const data = await travelModel.create({
-				...req.body,
-				image: image,
-				locationto: t2,
-				resort: resort,
-				userName: name,
-				userId: userExist._id,
-				interested: t,
-				// userInfo:userInfo
-			});
-			if (!data) {
-				return res.status(400).send('something went wrong');
+			if (!location && !resort) {
+				const data = await travelModel.create({
+					...req.body,
+					image: image,
+					// locationto: t2,
+					resort: resort,
+					userName: name,
+					userId: userExist._id,
+					interested: t,
+					// userInfo:userInfo
+				});
+				if (!data) {
+					return res.status(400).send('something went wrong');
+				} else {
+					const email = userId.email;
+					const mailOptions = {
+						from: process.env.Nodemailer_id,
+						to: process.env.Nodemailer_admin,
+						subject: 'New Travel Created',
+						html: `<h4>
+			  Dear Admin,
+			  A new Travel request has been submitted for approval. The Travel created by ${userId.username}.
+			  Please review the request and take appropriate action.
+			  Best regards,
+			  The Travel Management Team</h4>`,
+					};
+					console.log('Notification email sent to admin');
+					Mailsend(req, res, mailOptions);
+					return res
+						.status(201)
+						.json({ message: 'Travel request submitted for approval.' });
+				}
 			} else {
-				const email = userId.email;
-				const mailOptions = {
-					from: process.env.Nodemailer_id,
-					to: process.env.Nodemailer_admin,
-					subject: 'New Travel Created',
-					html: `<h4>
-          Dear Admin,
-          A new Travel request has been submitted for approval. The Travel created by ${userId.username}.
-          Please review the request and take appropriate action.
-          Best regards,
-          The Travel Management Team</h4>`,
-				};
-				console.log('Notification email sent to admin');
-				Mailsend(req, res, mailOptions);
-				return res
-					.status(201)
-					.json({ message: 'Travel request submitted for approval.' });
+				const data = await travelModel.create({
+					...req.body,
+					image: image,
+					// locationto: t2,
+					location: JSON.parse(location),
+					geometry: JSON.parse(geometry),
+					resort: resort,
+					userName: name,
+					userId: userExist._id,
+					interested: t,
+					// userInfo:userInfo
+				});
+				if (!data) {
+					return res.status(400).send('something went wrong');
+				} else {
+					const email = userId.email;
+					const mailOptions = {
+						from: process.env.Nodemailer_id,
+						to: process.env.Nodemailer_admin,
+						subject: 'New Travel Created',
+						html: `<h4>
+			  Dear Admin,
+			  A new Travel request has been submitted for approval. The Travel created by ${userId.username}.
+			  Please review the request and take appropriate action.
+			  Best regards,
+			  The Travel Management Team</h4>`,
+					};
+					console.log('Notification email sent to admin');
+					Mailsend(req, res, mailOptions);
+					return res
+						.status(201)
+						.json({ message: 'Travel request submitted for approval.' });
+				}
 			}
 		} catch (e) {
 			console.log(e);

@@ -1610,7 +1610,6 @@ module.exports = {
 				return res.status(400).send({ message: 'Invalid input' });
 			}
 
-			// Получаем всех пользователей по массиву ID за один запрос
 			const visitedUsers = await userModel.find({
 				_id: { $in: visitedUserIds },
 			});

@@ -47,7 +47,7 @@ module.exports = {
 			}
 			// const t2 = JSON.parse(locationto);
 			const t = JSON.parse(interested);
-			if (!location && !resort) {
+			if (!location && !geometry) {
 				const data = await travelModel.create({
 					...req.body,
 					image: image,

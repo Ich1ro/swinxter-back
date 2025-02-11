@@ -1,80 +1,70 @@
-const adminUser = require('../Model/adminUserModel');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const bannerModel = require('../Model/bannerModel');
+const adminUser = require("../Model/adminUserModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const bannerModel = require('../Model/bannerModel')
 
 module.exports = {
-	async get_users(req, res) {
-		try {
-		} catch (e) {
-			return res.status(500).send(e);
-		}
-	},
-	async login(req, res) {
-		try {
-			const { username, password } = req.body;
-			const user = await adminUser.findOne({ username: username });
-			if (!user) {
-				return res.status(400).send('User not found');
-			}
-			const passCheck = await bcrypt.compare(password, user.password);
-			if (passCheck) {
-				const token = jwt.sign({ id: user._id }, process.env.JWT_SECRETKEY);
-				const { password: pass, ...rest } = user._doc;
-				const options = {
+  async get_users(req, res) {
+    try {
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  },
+  async login(req,res){
+    try {
+      const {username,password} = req.body;
+      const user = await adminUser.findOne({username:username});
+      if(!user){
+        return res.status(400).send("User not found");
+      }
+      const passCheck = await bcrypt.compare(password,user.password);
+      if(passCheck){
+        const token = jwt.sign({id: user._id}, process.env.JWT_SECRETKEY);
+        const {password: pass, ...rest} = user._doc;
+        const options = {
 					expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
 					httpOnly: true,
 					sameSite: 'none',
 					secure: true,
 				};
-				return res
-					.cookie('access_token', token, options)
-					.status(200)
-					.send(rest);
-			} else {
-				return res.status(400).send('Invalid Credentials');
-			}
-		} catch (error) {
-			return res.status(500).send(error);
-		}
-	},
-	async signup(req, res) {
+        return res.cookie('access_token', token, options).status(200).send(rest);
+      }
+      else{
+        return res.status(400).send("Invalid Credentials");
+      }
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  },
+  async signup(req, res) {
+    try {
+      const {name,username,password,events,clubs,situationships,users,admins} = req.body;
+      const exist = await adminUser.findOne({username:username});
+      if(exist){
+        return res.status(400).send("username already exist");
+      }
+      const hash_password = await bcrypt.hash(password,10);
+      console.log(hash_password);
+      const data = await adminUser.create({
+        ...req.body,
+      });
+      data.password = hash_password;
+      await data.save();
+      if(!data){
+        return res.status(400).send("Failed to create the user");
+      }
+      else{
+        return res.status(201).send(data);
+      }
+    } catch (e) {
+      console.log(e);
+      return res.status(500).send(e);
+    }
+  },
+  async create_banner(req, res) {
 		try {
-			const {
-				name,
-				username,
-				password,
-				events,
-				clubs,
-				situationships,
-				users,
-				admins,
-			} = req.body;
-			const exist = await adminUser.findOne({ username: username });
-			if (exist) {
-				return res.status(400).send('username already exist');
-			}
-			const hash_password = await bcrypt.hash(password, 10);
-			console.log(hash_password);
-			const data = await adminUser.create({
-				...req.body,
-			});
-			data.password = hash_password;
-			await data.save();
-			if (!data) {
-				return res.status(400).send('Failed to create the user');
-			} else {
-				return res.status(201).send(data);
-			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).send(e);
-		}
-	},
-	async create_banner(req, res) {
-		try {
-			console.log(req.files);
-			console.log(req.body);
+      console.log(req.files);
+      console.log(req.body);  
 			if (!req.files || !req.files.image) {
 				return res.status(400).json({ message: 'Image required' });
 			}
@@ -118,62 +108,63 @@ module.exports = {
 			return res.status(200).send(banner);
 		} catch (e) {
 			console.error(e);
-			return res.status(500).send({ message: 'Internal server error' });
-		}
-	},
-	async getBanners(req, res) {
-		try {
-			const data = await bannerModel.find({});
-			return res.status(200).send(data);
-		} catch (e) {
-			return res.status(500).send(e);
-		}
-	},
-	async getBannerById(req, res) {
-		try {
-			const { id } = req.params;
-			const data = await bannerModel.findById(id);
-			return res.status(200).send(data);
-		} catch (e) {
-			return res.status(500).send(e);
-		}
-	},
-	async adminUsers(req, res) {
-		try {
-			const data = await adminUser.find({});
-			return res.status(200).send(data);
-		} catch (e) {
-			return res.status(500).send(e);
-		}
-	},
-	async updateAdmin(req, res) {
-		try {
-			const { id } = req.params;
-			const updateData = req.body.data;
-			console.log(req.body);
-
-			const updatedAdmin = await adminUser.findByIdAndUpdate(id, updateData, {
-				new: true,
-			});
-
-			if (!updatedAdmin) {
-				return res.status(404).send({ message: 'Admin not found' });
-			}
-
-			return res.status(200).send(updatedAdmin);
-		} catch (e) {
 			return res
 				.status(500)
-				.send({ message: 'Error updating admin', error: e });
+				.send({ message: 'Internal server error'});
 		}
 	},
-
-	async deleteUsers(req, res) {
-		try {
-			const data = await adminUser.findOneAndDelete({ _id: req.params.id });
-			return res.status(200).send('User delete successfully');
-		} catch (e) {
-			return res.status(500).send(e);
-		}
-	},
+  async getBanners(req,res){
+    try {
+      const data = await bannerModel.find({});
+      return res.status(200).send(data);
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  },
+  async getBannerById(req,res){
+    try {
+      const { id } = req.params;
+      const data = await bannerModel.findById(id);
+      return res.status(200).send(data);
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  },
+  async adminUsers(req,res){
+    try {
+      const data = await adminUser.find({});
+      return res.status(200).send(data);
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  },
+  async updateAdmin(req, res) {
+    try {
+      const { id } = req.params;
+      const updateData = req.body.data;
+      console.log(req.body);
+      
+  
+      const updatedAdmin = await adminUser.findByIdAndUpdate(id, updateData, {
+        new: true,
+      });
+  
+      if (!updatedAdmin) {
+        return res.status(404).send({ message: "Admin not found" });
+      }
+  
+      return res.status(200).send(updatedAdmin);
+    } catch (e) {
+      return res.status(500).send({ message: "Error updating admin", error: e });
+    }
+  },
+  
+  async deleteUsers(req,res){
+    try {
+      const data = await adminUser.findOneAndDelete({ _id: req.params.id });
+      return res.status(200).send("User delete successfully");
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  }
 };

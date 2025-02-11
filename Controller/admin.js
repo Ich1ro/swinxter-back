@@ -121,6 +121,15 @@ module.exports = {
       return res.status(500).send(e);
     }
   },
+  async getBannersByPage(req,res){
+    try {
+      const { page } = req.params;
+      const data = await bannerModel.find({page});
+      return res.status(200).send(data);
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  },
   async getBannerById(req,res){
     try {
       const { id } = req.params;

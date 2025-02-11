@@ -68,7 +68,8 @@ module.exports = {
 			}
 
 			const file = req.files.image[0];
-			const imageUrl = await S3Manager.put(`${req.page}_banners`, file);
+      
+			const imageUrl = await S3Manager.put(`${req.body.page}_banners`, file);
 
 			const imgUrl = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
 

@@ -1,6 +1,7 @@
 const adminUser = require("../Model/adminUserModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const bannerModel = require('../Model/bannerModel')
 
 module.exports = {
   async get_users(req, res) {
@@ -57,6 +58,73 @@ module.exports = {
       }
     } catch (e) {
       console.log(e);
+      return res.status(500).send(e);
+    }
+  },
+  async create_banner(req, res) {
+		try {
+			if (!req.files || !req.files.image) {
+				return res.status(400).json({ message: 'Image required' });
+			}
+
+			const file = req.files.image[0];
+			const imageUrl = await S3Manager.put(`${req.page}_banners`, file);
+
+			const imgUrl = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
+
+			const banner = new bannerModel({
+				title: req.body.title || '',
+				page: req.body.page || '',
+				active: req.body.active || false,
+				imgUrl,
+			});
+
+			await banner.save();
+
+			return res.status(201).send(banner);
+		} catch (e) {
+			console.error(e);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
+	async update_banner(req, res) {
+		try {
+			const { id } = req.params;
+			const { title, page, active } = req.body;
+
+			const banner = await bannerModel.findById(id);
+			if (!banner) {
+				return res.status(404).json({ message: 'Banner not found' });
+			}
+
+			banner.title = title || banner.title;
+			banner.page = page || banner.page;
+			banner.active = active || banner.active;
+
+			await banner.save();
+
+			return res.status(200).send(banner);
+		} catch (e) {
+			console.error(e);
+			return res
+				.status(500)
+				.send({ message: 'Internal server error'});
+		}
+	},
+  async getBanners(req,res){
+    try {
+      const data = await bannerModel.find({});
+      return res.status(200).send(data);
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  },
+  async getBannerById(req,res){
+    try {
+      const { id } = req.params;
+      const data = await bannerModel.findById(id);
+      return res.status(200).send(data);
+    } catch (e) {
       return res.status(500).send(e);
     }
   },

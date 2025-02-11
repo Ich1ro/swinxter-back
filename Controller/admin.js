@@ -2,6 +2,7 @@ const adminUser = require("../Model/adminUserModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const bannerModel = require('../Model/bannerModel')
+const { S3Manager } = require('../utils/s3')
 
 module.exports = {
   async get_users(req, res) {

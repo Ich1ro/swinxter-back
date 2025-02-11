@@ -12,6 +12,6 @@ router.get("/get_banners", admin.getBanners)
 router.get("/get_banner_by_id/:id", admin.getBannerById)
 router.post("/create_banner", upload.single("image"), admin.create_banner)
 router.post("/update_banner/:id", admin.update_banner)
-router.post("/delete_banner/:id", admin.deleteBanner)
+router.delete("/delete_banner/:id", admin.deleteBanner)
 
 module.exports = router;

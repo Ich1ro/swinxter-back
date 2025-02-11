@@ -66,7 +66,7 @@ module.exports = {
 			// if (!req.files && !req.files['image']) {
 			// 	return res.status(400).send({ message: 'Image required' });
 			// }
-      console.log(req.files);
+      console.log(req.file);
       // console.log(req.body.title);
       // console.log(req.body.page);
       // console.log(req.body.active);

@@ -21,6 +21,7 @@ const userController = require('../Controller/userController');
 const upload = require('../helper/multer');
 console.log(upload);
 router.post('/register', user.signup);
+router.get("/get_banner_by_page/:page", user.getBannersByPage)
 router.post('/login', user.login);
 router.post('/login4', user.login4);
 router.get('/active', verifyToken, user.userLoggedIN);

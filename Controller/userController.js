@@ -22,6 +22,7 @@ const { S3Manager } = require('../utils/s3');
 const { info } = require('console');
 const BusinessUser = require('../Model/businessUsersModel');
 const Notification = require('../Model/notificationModel');
+const bannerModel = require('../Model/bannerModel')
 
 module.exports = {
 	async signup(req, res) {
@@ -1642,6 +1643,15 @@ module.exports = {
 			console.log(e);
 		}
 	},
+	async getBannersByPage(req,res){
+		try {
+		  const { page } = req.params;
+		  const data = await bannerModel.find({page});
+		  return res.status(200).send(data);
+		} catch (e) {
+		  return res.status(500).send(e);
+		}
+	  },
 	async sendFriendRequest(req, res, next) {
 		const { id } = req.params;
 		const { friendId } = req.params;

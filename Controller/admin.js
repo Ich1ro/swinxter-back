@@ -158,7 +158,14 @@ module.exports = {
       return res.status(500).send({ message: "Error updating admin", error: e });
     }
   },
-  
+  async deleteBanner(req,res){
+    try {
+      const data = await bannerModel.findOneAndDelete({ _id: req.params.id });
+      return res.status(200).send("Banner delete successfully");
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  },
   async deleteUsers(req,res){
     try {
       const data = await adminUser.findOneAndDelete({ _id: req.params.id });

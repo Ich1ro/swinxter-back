@@ -77,7 +77,7 @@ module.exports = {
 			const banner = new bannerModel({
 				title: req.body.title || '',
 				page: req.body.page || '',
-				active: req.body.active || false,
+				active: req.body.active ? true : false || false,
 				imgUrl,
 			});
 

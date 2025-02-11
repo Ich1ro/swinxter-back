@@ -64,9 +64,13 @@ module.exports = {
   async create_banner(req, res) {
 		try {
 			if (!req.files && !req.files['image']) {
-				return res.status(400).json({ message: 'Image required' });
+				return res.status(400).send({ message: 'Image required' });
 			}
-
+      console.log(req.files['image']);
+      console.log(req.body.title);
+      console.log(req.body.page);
+      console.log(req.body.active);
+      
 			const file = req.files['image'];
       
 			const imageUrl = await S3Manager.put(`${req.body.page}_banners`, file);

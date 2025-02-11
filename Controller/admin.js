@@ -63,30 +63,32 @@ module.exports = {
   },
   async create_banner(req, res) {
 		try {
-			if (!req.files && !req.files['image']) {
-				return res.status(400).send({ message: 'Image required' });
-			}
-      console.log(req.files['image']);
-      console.log(req.body.title);
-      console.log(req.body.page);
-      console.log(req.body.active);
+			// if (!req.files && !req.files['image']) {
+			// 	return res.status(400).send({ message: 'Image required' });
+			// }
+      console.log(req.files);
+      // console.log(req.body.title);
+      // console.log(req.body.page);
+      // console.log(req.body.active);
       
-			const file = req.files['image'];
+			// const file = req.files['image'];
+
+      // console.log(file);
       
-			const imageUrl = await S3Manager.put(`${req.body.page}_banners`, file);
+			// const imageUrl = await S3Manager.put(`${req.body.page}_banners`, file);
 
-			const imgUrl = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
+			// const imgUrl = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
 
-			const banner = new bannerModel({
-				title: req.body.title || '',
-				page: req.body.page || '',
-				active: req.body.active ? true : false || false,
-				imgUrl,
-			});
+			// const banner = new bannerModel({
+			// 	title: req.body.title || '',
+			// 	page: req.body.page || '',
+			// 	active: req.body.active ? true : false || false,
+			// 	imgUrl: imgUrl,
+			// });
 
-			await banner.save();
+			// await banner.save();
 
-			return res.status(201).send(banner);
+			// return res.status(201).send(banner);
 		} catch (e) {
 			console.error(e);
 			res.status(500).send({ message: 'Internal server error' });

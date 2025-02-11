@@ -63,9 +63,7 @@ module.exports = {
   },
   async create_banner(req, res) {
 		try {
-      console.log(req.files);
-      console.log(req.body);  
-			if (!req.files || !req.files.image) {
+			if (!req.files || !req.files['image']) {
 				return res.status(400).json({ message: 'Image required' });
 			}
 

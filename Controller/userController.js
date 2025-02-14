@@ -1418,7 +1418,7 @@ module.exports = {
 	async getSituationshipById(req, res) {
 		try {
 			const { userId } = req.params;
-			const situationships = await travel.find({ userId: userId });
+			const situationships = await travel.find({ userId: new mongoose.Types.ObjectId(userId) });
 
 			return res.status(200).send(situationships);
 		} catch (e) {

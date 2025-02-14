@@ -23,6 +23,7 @@ const { info } = require('console');
 const BusinessUser = require('../Model/businessUsersModel');
 const Notification = require('../Model/notificationModel');
 const bannerModel = require('../Model/bannerModel')
+const travel = require('../Model/travel')
 
 module.exports = {
 	async signup(req, res) {
@@ -1409,6 +1410,17 @@ module.exports = {
 			exist.followers.push(req.user._id);
 			await exist.save();
 			Mailsend(req, res, mailOptions);
+		} catch (e) {
+			console.log(e);
+			return res.status(500).send(e);
+		}
+	},
+	async getSituationshipById(req, res) {
+		try {
+			const { userId } = req.params;
+			const situationships = await travel.find({ userId: userId });
+
+			return res.status(200).send(situationships);
 		} catch (e) {
 			console.log(e);
 			return res.status(500).send(e);

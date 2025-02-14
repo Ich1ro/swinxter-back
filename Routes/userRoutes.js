@@ -138,6 +138,7 @@ router.put('/remove_friend/:id/:friendId', userController.removeFriend);
 router.put('/send_request/:id/:friendId', userController.sendFriendRequest);
 router.put('/cancel_request/:id/:friendId', userController.cancelFriendRequest);
 router.put('/accept_req/:id/:friendId', userController.accept_req);
+router.put('/decline_req/:id/:friendId', userController.decline_req);
 router.post('/blockuser', userController.blockUser);
 router.post('/add_visitor/:id', userController.add_visitors);
 router.post('/unblockuser', userController.unblockUser);

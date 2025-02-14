@@ -47,7 +47,7 @@ router.post('/forget', user.forget);
 router.post('/verifyOtp', user.verifyOtp);
 router.post('/reset_pass', user.reset_pass);
 router.get('/findOne/:id', user.findOne);
-router.get('/situationships_by_user_id/:id', user.getSituationshipById);
+router.get('/situationships_by_user_id/:userId', user.getSituationshipById);
 router.put(
 	'/update',
 	upload.fields([

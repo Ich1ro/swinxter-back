@@ -1735,6 +1735,27 @@ module.exports = {
 			console.log(e);
 		}
 	},
+	async decline_req(req, res, next) {
+		const { id } = req.params;
+		const { friendId } = req.params;
+		try {
+			const data = await userModel.findById({ _id: id });
+			const index = data.friend_requests.indexOf(friendId);
+			data.friend_requests.splice(index, 1);
+			// data.friends.push(friendId);
+			await data.save();
+			const friend = await userModel.findById({ _id: friendId });
+			const friendIndex = data.sent_requests.indexOf(id);
+			friend.sent_requests.splice(friendIndex, 1);
+			// friend.friends.push(id);
+			await friend.save();
+			
+			res.status(200).send('Friend Added succesfully');
+		} catch (e) {
+			res.status(400).send(e);
+			console.log(e);
+		}
+	},
 	async allUsers(req, res) {
 		let users = [];
 		try {

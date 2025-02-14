@@ -23,7 +23,7 @@ const { info } = require('console');
 const BusinessUser = require('../Model/businessUsersModel');
 const Notification = require('../Model/notificationModel');
 const bannerModel = require('../Model/bannerModel')
-const travel = require('../Model/travel')
+const travelModel = require('../Model/travel');
 
 module.exports = {
 	async signup(req, res) {
@@ -1420,7 +1420,7 @@ module.exports = {
 			const { userId } = req.params;
 			console.log(userId);
 			
-			const situationships = await travel.find({ userId: userId });
+			const situationships = await travelModel.find({ userId: userId });
 
 			return res.status(200).send(situationships);
 		} catch (e) {

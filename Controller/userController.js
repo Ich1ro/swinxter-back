@@ -1811,28 +1811,39 @@ module.exports = {
 		const userId = req.body.userId;
 		const blockId = req.body.blockId;
 		try {
-			const data = await userModel.findById({ _id: userId });
+		  const data = await userModel.findById({ _id: userId });
+		  const blockedIndex = data.blocked_users.indexOf(blockId);
+		  
+		  if (blockedIndex !== -1) {
+			// Unblock user
+			data.blocked_users.splice(blockedIndex, 1);
+			const blockedUser = await userModel.findById({ _id: blockId });
+			const blockedByIndex = blockedUser.blockedby.indexOf(userId);
+			if (blockedByIndex !== -1) {
+			  blockedUser.blockedby.splice(blockedByIndex, 1);
+			}
+			await blockedUser.save();
+		  } else {
+			// Block user
 			data.blocked_users.push(blockId);
 			const blockUserInFriend = data.friends.indexOf(blockId);
-			if (blockUserInFriend !== null) {
-				data.friends.splice(blockUserInFriend, 1);
+			if (blockUserInFriend !== -1) {
+			  data.friends.splice(blockUserInFriend, 1);
 			}
-			data.save();
 			const blockedUser = await userModel.findById({ _id: blockId });
 			blockedUser.blockedby.push(userId);
 			const userInFriend = blockedUser.friends.indexOf(userId);
-			if (userInFriend !== null) {
-				blockedUser.friends.splice(userInFriend, 1);
+			if (userInFriend !== -1) {
+			  blockedUser.friends.splice(userInFriend, 1);
 			}
-			blockedUser.save();
-			if (!data) {
-				return res.status(400).send('something went wrong');
-			} else {
-				return res.status(200).send(data);
-			}
+			await blockedUser.save();
+		  }
+		  
+		  await data.save();
+		  return res.status(200).send(data);
 		} catch (e) {
-			console.log(e);
-			return res.status(500).send(e);
+		  console.log(e);
+		  return res.status(500).send(e);
 		}
 	},
 	async advancedSearch(req, res) {

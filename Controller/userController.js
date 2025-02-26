@@ -2306,6 +2306,22 @@ module.exports = {
 				return res.status(404).send({ message: 'User not found' });
 			}
 			user.isAccountVerify = true;
+
+			if (user.payment?.membership) {
+				const currentExpiry = new Date(user.payment.membership_expiry);
+				currentExpiry.setMonth(currentExpiry.getMonth() + 1);
+				user.payment.membership_expiry = currentExpiry.toISOString();
+			} else {
+				user.payment = {
+					membership: true,
+					membership_pause: false,
+					membership_price: "0.00",
+					last_payment: new Date().toISOString(),
+					membership_expiry: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
+					membership_plan: "1 Month Free",
+				};
+			}
+
 			await user.save();
 
 			const updatedUsers = await userModel.find();

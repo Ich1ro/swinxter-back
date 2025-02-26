@@ -116,6 +116,7 @@ const UserSchema = new mongoose.Schema(
 		commission: { type: String },
 		wallet: { type: Number, default: 0 },
 		isVerify: { type: Boolean, default: false },
+		isAccountVerify: { type: Boolean, default: false },
 		modelVerify: { type: Boolean, default: false },
 		otp: { type: String },
 		personName: { type: String },

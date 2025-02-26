@@ -22,7 +22,7 @@ const { S3Manager } = require('../utils/s3');
 const { info } = require('console');
 const BusinessUser = require('../Model/businessUsersModel');
 const Notification = require('../Model/notificationModel');
-const bannerModel = require('../Model/bannerModel')
+const bannerModel = require('../Model/bannerModel');
 const travel = require('../Model/travel');
 
 module.exports = {
@@ -1419,7 +1419,7 @@ module.exports = {
 		try {
 			const { userId } = req.params;
 			console.log(userId);
-			
+
 			const situationships = await travel.find({ userId: userId });
 
 			return res.status(200).send(situationships);
@@ -1657,15 +1657,15 @@ module.exports = {
 			console.log(e);
 		}
 	},
-	async getBannersByPage(req,res){
+	async getBannersByPage(req, res) {
 		try {
-		  const { page } = req.params;
-		  const data = await bannerModel.find({page});
-		  return res.status(200).send(data);
+			const { page } = req.params;
+			const data = await bannerModel.find({ page });
+			return res.status(200).send(data);
 		} catch (e) {
-		  return res.status(500).send(e);
+			return res.status(500).send(e);
 		}
-	  },
+	},
 	async sendFriendRequest(req, res, next) {
 		const { id } = req.params;
 		const { friendId } = req.params;
@@ -1749,7 +1749,7 @@ module.exports = {
 			friend.sent_requests.splice(friendIndex, 1);
 			// friend.friends.push(id);
 			await friend.save();
-			
+
 			res.status(200).send('Friend Added succesfully');
 		} catch (e) {
 			res.status(400).send(e);
@@ -1811,39 +1811,39 @@ module.exports = {
 		const userId = req.body.userId;
 		const blockId = req.body.blockId;
 		try {
-		  const data = await userModel.findById({ _id: userId });
-		  const blockedIndex = data.blocked_users.indexOf(blockId);
-		  
-		  if (blockedIndex !== -1) {
-			// Unblock user
-			data.blocked_users.splice(blockedIndex, 1);
-			const blockedUser = await userModel.findById({ _id: blockId });
-			const blockedByIndex = blockedUser.blockedby.indexOf(userId);
-			if (blockedByIndex !== -1) {
-			  blockedUser.blockedby.splice(blockedByIndex, 1);
+			const data = await userModel.findById({ _id: userId });
+			const blockedIndex = data.blocked_users.indexOf(blockId);
+
+			if (blockedIndex !== -1) {
+				// Unblock user
+				data.blocked_users.splice(blockedIndex, 1);
+				const blockedUser = await userModel.findById({ _id: blockId });
+				const blockedByIndex = blockedUser.blockedby.indexOf(userId);
+				if (blockedByIndex !== -1) {
+					blockedUser.blockedby.splice(blockedByIndex, 1);
+				}
+				await blockedUser.save();
+			} else {
+				// Block user
+				data.blocked_users.push(blockId);
+				const blockUserInFriend = data.friends.indexOf(blockId);
+				if (blockUserInFriend !== -1) {
+					data.friends.splice(blockUserInFriend, 1);
+				}
+				const blockedUser = await userModel.findById({ _id: blockId });
+				blockedUser.blockedby.push(userId);
+				const userInFriend = blockedUser.friends.indexOf(userId);
+				if (userInFriend !== -1) {
+					blockedUser.friends.splice(userInFriend, 1);
+				}
+				await blockedUser.save();
 			}
-			await blockedUser.save();
-		  } else {
-			// Block user
-			data.blocked_users.push(blockId);
-			const blockUserInFriend = data.friends.indexOf(blockId);
-			if (blockUserInFriend !== -1) {
-			  data.friends.splice(blockUserInFriend, 1);
-			}
-			const blockedUser = await userModel.findById({ _id: blockId });
-			blockedUser.blockedby.push(userId);
-			const userInFriend = blockedUser.friends.indexOf(userId);
-			if (userInFriend !== -1) {
-			  blockedUser.friends.splice(userInFriend, 1);
-			}
-			await blockedUser.save();
-		  }
-		  
-		  await data.save();
-		  return res.status(200).send(data);
+
+			await data.save();
+			return res.status(200).send(data);
 		} catch (e) {
-		  console.log(e);
-		  return res.status(500).send(e);
+			console.log(e);
+			return res.status(500).send(e);
 		}
 	},
 	async advancedSearch(req, res) {
@@ -2289,6 +2289,24 @@ module.exports = {
 				user.isVerify = true;
 				await user.save();
 			}
+
+			const updatedUsers = await userModel.find();
+
+			res.status(200).send(updatedUsers);
+		} catch (error) {
+			console.error('Error updating user:', error);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
+	async verifyUserAccount(req, res) {
+		const { id } = req.params;
+		try {
+			const user = await userModel.findById(id);
+			if (!user) {
+				return res.status(404).send({ message: 'User not found' });
+			}
+			user.isAccountVerify = true;
+			await user.save();
 
 			const updatedUsers = await userModel.find();
 

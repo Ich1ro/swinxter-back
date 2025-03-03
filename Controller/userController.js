@@ -24,6 +24,7 @@ const BusinessUser = require('../Model/businessUsersModel');
 const Notification = require('../Model/notificationModel');
 const bannerModel = require('../Model/bannerModel');
 const travel = require('../Model/travel');
+const verification = require('../Model/verificationModel')
 
 module.exports = {
 	async signup(req, res) {
@@ -2300,26 +2301,37 @@ module.exports = {
 	},
 	async verifyUserAccount(req, res) {
 		const { id } = req.params;
+		const { data, verifiedPerson } = req.body;
 		try {
 			const user = await userModel.findById(id);
 			if (!user) {
 				return res.status(404).send({ message: 'User not found' });
 			}
-			user.isAccountVerify = true;
 
-			if (user.payment?.membership) {
-				const currentExpiry = new Date(user.payment.membership_expiry);
-				currentExpiry.setMonth(currentExpiry.getMonth() + 1);
-				user.payment.membership_expiry = currentExpiry.toISOString();
+			let verificationRecord;
+			if (!user?.verificationId) {
+				verificationRecord = new verification({
+					userId: user._id,
+					verification_result: [data],
+				});
+				await verificationRecord.save();
+				user.verificationId = verificationRecord._id;
 			} else {
-				user.payment = {
-					membership: true,
-					membership_pause: false,
-					membership_price: "0.00",
-					last_payment: new Date().toISOString(),
-					membership_expiry: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
-					membership_plan: "1 Month Free",
-				};
+				verificationRecord = await verification.findById(
+					user.verificationId
+				);
+				if (verificationRecord) {
+					verificationRecord.verification_result.push(data);
+					await verificationRecord.save();
+				}
+			}
+
+			if (user.profile_type === "couple" && verifiedPerson) {
+				if (verifiedPerson === "person1") {
+					user.couple.person1.isVerify = true;
+				} else if (verifiedPerson === "person2") {
+					user.couple.person2.isVerify = true;
+				}
 			}
 
 			await user.save();
@@ -2332,6 +2344,40 @@ module.exports = {
 			res.status(500).send({ message: 'Internal server error' });
 		}
 	},
+	// async verifyUserAccount(req, res) {
+	// 	const { id } = req.params;
+	// 	try {
+	// 		const user = await userModel.findById(id);
+	// 		if (!user) {
+	// 			return res.status(404).send({ message: 'User not found' });
+	// 		}
+	// 		user.isAccountVerify = true;
+
+	// 		if (user.payment?.membership) {
+	// 			const currentExpiry = new Date(user.payment.membership_expiry);
+	// 			currentExpiry.setMonth(currentExpiry.getMonth() + 1);
+	// 			user.payment.membership_expiry = currentExpiry.toISOString();
+	// 		} else {
+	// 			user.payment = {
+	// 				membership: true,
+	// 				membership_pause: false,
+	// 				membership_price: "0.00",
+	// 				last_payment: new Date().toISOString(),
+	// 				membership_expiry: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
+	// 				membership_plan: "1 Month Free",
+	// 			};
+	// 		}
+
+	// 		await user.save();
+
+	// 		const updatedUsers = await userModel.find();
+
+	// 		res.status(200).send(updatedUsers);
+	// 	} catch (error) {
+	// 		console.error('Error updating user:', error);
+	// 		res.status(500).send({ message: 'Internal server error' });
+	// 	}
+	// },
 };
 
 // const MERCHANT_ID = "YOUR_MERCHANT_ID";

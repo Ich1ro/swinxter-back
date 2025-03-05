@@ -153,6 +153,7 @@ router.post('/create-subscription', userController.add_subscription);
 router.post('/advanced-search', userController.advancedSearch);
 router.post('/approve_user/:id', userController.approveUser);
 router.post('/verify-user-acc/:id', userController.verifyUserAccount);
+router.get('/verification-payment-success/:id', userController.userVerificationPayment);
 
 router.post('/send_dummy_emails', userController.sendDummyEmails);
 

@@ -2299,6 +2299,32 @@ module.exports = {
 			res.status(500).send({ message: 'Internal server error' });
 		}
 	},
+	async approveBanner(req, res) {
+		const { id } = req.params;
+		const { suspend } = req.body;
+
+		try {
+			if (suspend) {
+				await bannerModel.findOneAndUpdate(
+					{ _id: id },
+					{ isApprove: false },
+					{ new: true }
+				);
+			} else {
+				const banner = await bannerModel.findById(id);
+				if (!banner) {
+					return res.status(404).send({ message: 'User not found' });
+				}
+				banner.isApprove = true;
+				await banner.save();
+			}
+
+			res.status(200).send({success: true});
+		} catch (error) {
+			console.error('Error updating user:', error);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
 	async verifyUserAccount(req, res) {
 		const { id } = req.params;
 		const { data, verifiedPerson } = req.body;

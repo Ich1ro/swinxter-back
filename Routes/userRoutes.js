@@ -21,7 +21,7 @@ const userController = require('../Controller/userController');
 const upload = require('../helper/multer');
 console.log(upload);
 router.post('/register', user.signup);
-router.get("/get_banner_by_page/:page", user.getBannersByPage)
+router.get('/get_banner_by_page/:page', user.getBannersByPage);
 router.post('/login', user.login);
 router.post('/login4', user.login4);
 router.get('/active', verifyToken, user.userLoggedIN);
@@ -153,8 +153,15 @@ router.post('/create-subscription', userController.add_subscription);
 router.post('/advanced-search', userController.advancedSearch);
 router.post('/approve_user/:id', userController.approveUser);
 router.post('/verify-user-acc/:id', userController.verifyUserAccount);
-router.get('/verification-payment-success/:id', userController.userVerificationPayment);
-router.post('/create-banner', upload.none(), userController.createBanner);
+router.get(
+	'/verification-payment-success/:id',
+	userController.userVerificationPayment
+);
+router.post(
+	'/create-banner',
+	upload.fields([{ name: 'mainImage' }]),
+	userController.createBanner
+);
 router.get('/get-banners/:id', userController.getBanners);
 router.get('/banner-payment_success', userController.bannerPayment);
 

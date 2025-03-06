@@ -2385,8 +2385,16 @@ module.exports = {
 	async createBanner(req, res) {
 		const { title, page, userId } = req.body;
 		try {
+			console.log(req.body.title);
+			console.log(req.body.page);
+			console.log(req.body.userId);
 			var mainImage;
 			const exist = await BusinessUser.findOne({ _id: userId });
+
+			if (!exist) {
+				return res.status(404).json({ message: "User not found" });
+			}
+
 			if (req.files && req.files['mainImage']) {
 				for (const uploadedImage of req.files['mainImage']) {
 					const imageUrl = await S3Manager.put(
@@ -2396,7 +2404,8 @@ module.exports = {
 					mainImage = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
 				}
 			}
-
+			console.log(mainImage);
+			
 			// if (req.files['image']) {
 			// 	for (const images of req.files['image']) {
 			// 		image.push(`${process.env.Backend_URL_Image}${images.filename}`);
@@ -2418,6 +2427,10 @@ module.exports = {
 				isApprove: false,
 				isPaid: false,
 			});
+
+			if (!data) {
+				return res.status(400).json({ message: "Failed to create banner" });
+			}
 
 			exist.bannerId = data?._id;
 			await exist.save()

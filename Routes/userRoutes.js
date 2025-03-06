@@ -157,6 +157,10 @@ router.get(
 	'/verification-payment-success/:id',
 	userController.userVerificationPayment
 );
+router.get(
+	'/banner-payment-success/:id',
+	userController.bannerPaymentSuccess
+);
 router.post(
 	'/create-banner',
 	upload.fields([{ name: 'mainImage' }]),

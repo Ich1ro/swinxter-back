@@ -2360,6 +2360,23 @@ module.exports = {
 			res.status(500).send({ message: 'Internal server error' });
 		}
 	},
+	async bannerPaymentSuccess(req, res) {
+		const { id } = req.params;
+		try {
+			const banner = await userModel.findById(id);
+			if (!banner) {
+				return res.status(404).send({ message: 'Banner not found' });
+			}
+			banner.isPaid = true;
+
+			await banner.save();
+
+			res.status(200).send({ data: 'success' });
+		} catch (error) {
+			console.error('Error updating user:', error);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
 	async getBanners(req, res) {
 		const { id } = req.params;
 		try {

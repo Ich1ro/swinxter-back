@@ -2389,7 +2389,7 @@ module.exports = {
 	async bannerPaymentSuccess(req, res) {
 		const { id } = req.params;
 		try {
-			const banner = await userModel.findById(id);
+			const banner = await bannerModel.findById(id);
 			if (!banner) {
 				return res.status(404).send({ message: 'Banner not found' });
 			}

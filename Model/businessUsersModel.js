@@ -4,7 +4,7 @@ const BusinessUserSchema = new mongoose.Schema(
 	{
 		profile_type: {
 			type: String,
-			default: 'business'
+			default: 'business',
 		},
 		// firstName: { type: String },
 		// lastName: { type: String },
@@ -21,9 +21,10 @@ const BusinessUserSchema = new mongoose.Schema(
 		},
 		image: { type: String, default: '' },
 		paymentUser: { type: String },
+		bannerId: { type: Schema.Types.ObjectId, ref: "bannerModel" },
 		isVerify: { type: Boolean, default: false },
 		isLogged: { type: Boolean, default: false },
-		role: {type: String, default: 'business'},
+		role: { type: String, default: 'business' },
 		stream_token: { type: String },
 	},
 	{

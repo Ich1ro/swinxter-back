@@ -24,7 +24,7 @@ const BusinessUser = require('../Model/businessUsersModel');
 const Notification = require('../Model/notificationModel');
 const bannerModel = require('../Model/bannerModel');
 const travel = require('../Model/travel');
-const verification = require('../Model/verificationModel')
+const verification = require('../Model/verificationModel');
 
 module.exports = {
 	async signup(req, res) {
@@ -2302,6 +2302,7 @@ module.exports = {
 	async verifyUserAccount(req, res) {
 		const { id } = req.params;
 		const { data, verifiedPerson } = req.body;
+
 		try {
 			const user = await userModel.findById(id);
 			if (!user) {
@@ -2317,19 +2318,17 @@ module.exports = {
 				await verificationRecord.save();
 				user.verificationId = verificationRecord._id;
 			} else {
-				verificationRecord = await verification.findById(
-					user.verificationId
-				);
+				verificationRecord = await verification.findById(user.verificationId);
 				if (verificationRecord) {
 					verificationRecord.verification_result.push(data);
 					await verificationRecord.save();
 				}
 			}
 
-			if (user.profile_type === "couple" && verifiedPerson) {
-				if (verifiedPerson === "person1") {
+			if (user.profile_type === 'couple' && verifiedPerson) {
+				if (verifiedPerson === 'person1') {
 					user.couple.person1.isVerify = true;
-				} else if (verifiedPerson === "person2") {
+				} else if (verifiedPerson === 'person2') {
 					user.couple.person2.isVerify = true;
 				}
 			}
@@ -2355,10 +2354,104 @@ module.exports = {
 
 			await user.save();
 
-			res.status(200).send({data: 'success'});
+			res.status(200).send({ data: 'success' });
 		} catch (error) {
 			console.error('Error updating user:', error);
 			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
+	async getBanners(req, res) {
+		const { id } = req.params;
+		try {
+			const banners = await bannerModel.findById(id);
+			res.status(200).send(banners);
+		} catch (error) {
+			console.error('Error updating user:', error);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
+	async bannerPayment(req, res) {
+		const { id } = req.params;
+		try {
+			const banners = await bannerModel.findOne({userId: id});
+			banners.isPaid = true
+			await banners.save()
+			res.status(200).send(banners);
+		} catch (error) {
+			console.error('Error updating user:', error);
+			res.status(500).send({ message: 'Internal server error' });
+		}
+	},
+	async createBanner(req, res) {
+		const {
+			title,
+			page,
+			userId
+		} = req.body;
+		try {
+			var mainImage;
+			const exist = await BusinessUser.findById(userId);
+			if (req.files && req.files['mainImage']) {
+				for (const uploadedImage of req.files['mainImage']) {
+					const imageUrl = await S3Manager.put(`${page}_banners`, uploadedImage);
+					mainImage = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
+				}
+			}
+
+			const updateData = {
+				title: title,
+				page: page,
+				imgUrl: mainImage,
+				userId: exist._id,
+				active: false,
+				isApprove: false,
+				isPaid: false
+			};
+
+			console.log(updateData);
+
+			// if (req.files['image']) {
+			// 	for (const images of req.files['image']) {
+			// 		image.push(`${process.env.Backend_URL_Image}${images.filename}`);
+			// 	}
+			// }
+			// // Check if videos were uploaded
+			// if (req.files['video']) {
+			// 	for (const videos of req.files['video']) {
+			// 		video.push(`${process.env.Backend_URL_Image}${videos.filename}`);
+			// 	}
+			// }
+
+			const data = await bannerModel.create({
+				...updateData,
+			});
+		// 	if (!data) {
+		// 		return res.status(400).send('Failed to Create club');
+		// 	} else {
+		// 		const mailOptions = {
+		// 			from: process.env.Nodemailer_id,
+		// 			to: process.env.Nodemailer_admin,
+		// 			subject: 'New Business Created',
+		// 			html: `<h4>
+        //   Dear Admin,
+        //   A new Business request has been submitted for approval. The Business name is ${business_name}.
+        //   Please review the request and take appropriate action.
+        //   Best regards,
+        //   The Business Management Team</h4>`,
+		// 		};
+		// 		console.log('Notification email sent to admin');
+		// 		Mailsend(req, res, mailOptions);
+		// 		return res
+		// 			.status(201)
+		// 			.json({
+		// 				message: 'Business request submitted for approval.',
+		// 				email: userExist.email,
+		// 			});
+		// 	}
+		return res.status(200).send(data)
+		} catch (error) {
+			console.log(error);
+			return res.status(500).send(error);
 		}
 	},
 };

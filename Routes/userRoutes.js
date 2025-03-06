@@ -154,6 +154,9 @@ router.post('/advanced-search', userController.advancedSearch);
 router.post('/approve_user/:id', userController.approveUser);
 router.post('/verify-user-acc/:id', userController.verifyUserAccount);
 router.get('/verification-payment-success/:id', userController.userVerificationPayment);
+router.post('/create-banner', userController.createBanner);
+router.get('/get-banners/:id', userController.getBanners);
+router.get('/banner-payment_success', userController.bannerPayment);
 
 router.post('/send_dummy_emails', userController.sendDummyEmails);
 

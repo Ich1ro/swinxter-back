@@ -2390,7 +2390,7 @@ module.exports = {
 		} = req.body;
 		try {
 			var mainImage;
-			const exist = await BusinessUser.findById(userId);
+			const exist = await BusinessUser.findOne({_id: userId});
 			if (req.files && req.files['mainImage']) {
 				for (const uploadedImage of req.files['mainImage']) {
 					const imageUrl = await S3Manager.put(`${page}_banners`, uploadedImage);
@@ -2402,7 +2402,7 @@ module.exports = {
 				title: title,
 				page: page,
 				imgUrl: mainImage,
-				userId: exist._id,
+				userId: exist?._id,
 				active: false,
 				isApprove: false,
 				isPaid: false

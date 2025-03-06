@@ -2373,9 +2373,9 @@ module.exports = {
 	async bannerPayment(req, res) {
 		const { id } = req.params;
 		try {
-			const banners = await bannerModel.findOne({userId: id});
-			banners.isPaid = true
-			await banners.save()
+			const banners = await bannerModel.findOne({ userId: id });
+			banners.isPaid = true;
+			await banners.save();
 			res.status(200).send(banners);
 		} catch (error) {
 			console.error('Error updating user:', error);
@@ -2383,30 +2383,19 @@ module.exports = {
 		}
 	},
 	async createBanner(req, res) {
-		const {
-			title,
-			page,
-			userId
-		} = req.body;
+		const { title, page, userId } = req.body;
 		try {
 			var mainImage;
-			const exist = await BusinessUser.findOne({_id: userId});
+			const exist = await BusinessUser.findOne({ _id: userId });
 			if (req.files && req.files['mainImage']) {
 				for (const uploadedImage of req.files['mainImage']) {
-					const imageUrl = await S3Manager.put(`${page}_banners`, uploadedImage);
+					const imageUrl = await S3Manager.put(
+						`${page}_banners`,
+						uploadedImage
+					);
 					mainImage = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageUrl}`;
 				}
 			}
-
-			const updateData = {
-				title: title,
-				page: page,
-				imgUrl: mainImage,
-				userId: exist?._id,
-				active: false,
-				isApprove: false,
-				isPaid: false
-			};
 
 			console.log(updateData);
 
@@ -2423,32 +2412,41 @@ module.exports = {
 			// }
 
 			const data = await bannerModel.create({
-				...updateData,
+				title: req.body.title,
+				page: req.body.page,
+				imgUrl: mainImage,
+				userId: exist?._id,
+				active: false,
+				isApprove: false,
+				isPaid: false,
 			});
-		// 	if (!data) {
-		// 		return res.status(400).send('Failed to Create club');
-		// 	} else {
-		// 		const mailOptions = {
-		// 			from: process.env.Nodemailer_id,
-		// 			to: process.env.Nodemailer_admin,
-		// 			subject: 'New Business Created',
-		// 			html: `<h4>
-        //   Dear Admin,
-        //   A new Business request has been submitted for approval. The Business name is ${business_name}.
-        //   Please review the request and take appropriate action.
-        //   Best regards,
-        //   The Business Management Team</h4>`,
-		// 		};
-		// 		console.log('Notification email sent to admin');
-		// 		Mailsend(req, res, mailOptions);
-		// 		return res
-		// 			.status(201)
-		// 			.json({
-		// 				message: 'Business request submitted for approval.',
-		// 				email: userExist.email,
-		// 			});
-		// 	}
-		return res.status(200).send(data)
+
+			exist.bannerId = data?._id;
+			await exist.save()
+			// 	if (!data) {
+			// 		return res.status(400).send('Failed to Create club');
+			// 	} else {
+			// 		const mailOptions = {
+			// 			from: process.env.Nodemailer_id,
+			// 			to: process.env.Nodemailer_admin,
+			// 			subject: 'New Business Created',
+			// 			html: `<h4>
+			//   Dear Admin,
+			//   A new Business request has been submitted for approval. The Business name is ${business_name}.
+			//   Please review the request and take appropriate action.
+			//   Best regards,
+			//   The Business Management Team</h4>`,
+			// 		};
+			// 		console.log('Notification email sent to admin');
+			// 		Mailsend(req, res, mailOptions);
+			// 		return res
+			// 			.status(201)
+			// 			.json({
+			// 				message: 'Business request submitted for approval.',
+			// 				email: userExist.email,
+			// 			});
+			// 	}
+			return res.status(200).send(data);
 		} catch (error) {
 			console.log(error);
 			return res.status(500).send(error);

@@ -2313,13 +2313,15 @@ module.exports = {
 			} else {
 				const banner = await bannerModel.findById(id);
 				if (!banner) {
-					return res.status(404).send({ message: 'User not found' });
+					return res.status(404).send({ message: 'Banner not found' });
 				}
 				banner.isApprove = true;
 				await banner.save();
 			}
 
-			res.status(200).send({success: true});
+			const banners = await bannerModel.find()
+
+			res.status(200).send(banners);
 		} catch (error) {
 			console.error('Error updating user:', error);
 			res.status(500).send({ message: 'Internal server error' });

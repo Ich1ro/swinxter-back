@@ -325,6 +325,19 @@ module.exports = {
 			if (findUser_Status.isLogged) {
 				return res.status(200).send(findUser_Status);
 			}
+
+			if (findUser_Status?.payment && findUser_Status?.payment?.membership && findUser_Status?.payment?.membership_expiry) {
+				const now = new Date();
+				const expiryDate = new Date(findUser_Status?.payment?.membership_expiry);
+	
+				if (expiryDate < now) {
+					findUser_Status.payment = {
+						membership: false,
+						membership_pause: false
+					};
+					await findUser_Status.save();
+				}
+			}
 		} catch (err) {
 			console.log(err, 'NOW');
 			return res.status(500).send(err);

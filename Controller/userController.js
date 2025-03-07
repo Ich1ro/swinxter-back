@@ -354,11 +354,7 @@ module.exports = {
 				.find({ createdAt: { $gte: thirtyDaysAgo } })
 				.sort({ createdAt: -1 });
 
-			if (recentUsers.length !== 0) {
-				res.status(200).send({ success: true, users: recentUsers });
-			} else {
-				res.status(200).send({ message: 'No recent users found!' });
-			}
+			res.status(200).send(recentUsers);
 		} catch (err) {
 			console.error(err);
 			return res.status(500).send(err);
@@ -2319,7 +2315,7 @@ module.exports = {
 				await banner.save();
 			}
 
-			const banners = await bannerModel.find()
+			const banners = await bannerModel.find();
 
 			res.status(200).send(banners);
 		} catch (error) {
@@ -2437,7 +2433,7 @@ module.exports = {
 			const exist = await BusinessUser.findOne({ _id: userId });
 
 			if (!exist) {
-				return res.status(404).json({ message: "User not found" });
+				return res.status(404).json({ message: 'User not found' });
 			}
 
 			if (req.files && req.files['mainImage']) {
@@ -2450,7 +2446,7 @@ module.exports = {
 				}
 			}
 			console.log(mainImage);
-			
+
 			// if (req.files['image']) {
 			// 	for (const images of req.files['image']) {
 			// 		image.push(`${process.env.Backend_URL_Image}${images.filename}`);
@@ -2474,11 +2470,11 @@ module.exports = {
 			});
 
 			if (!data) {
-				return res.status(400).json({ message: "Failed to create banner" });
+				return res.status(400).json({ message: 'Failed to create banner' });
 			}
 
 			exist.bannerId = data?._id;
-			await exist.save()
+			await exist.save();
 			// 	if (!data) {
 			// 		return res.status(400).send('Failed to Create club');
 			// 	} else {

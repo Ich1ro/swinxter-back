@@ -94,6 +94,7 @@ const UserSchema = new mongoose.Schema(
 		Relationship: { type: String },
 		Drugs: { type: String },
 		Language: { type: String },
+		sessionExpiry: { type: Date, default: null },
 		piercings: { type: String },
 		language: { type: String },
 		circumcised: { type: String },

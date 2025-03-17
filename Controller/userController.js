@@ -208,6 +208,7 @@ module.exports = {
 							expiresIn: '10d',
 						}
 					);
+
 					const stream_id = businessExist._id.toString();
 					const stream_token = serverClient.createToken(stream_id);
 					businessExist.stream_token = stream_token;
@@ -244,6 +245,8 @@ module.exports = {
 				const stream_token = serverClient.createToken(stream_id);
 				exist.stream_token = stream_token;
 				exist.isLogged = true;
+				const expiryDate = new Date(Date.now() + 60 * 60 * 1000);
+				exist.sessionExpiry = expiryDate;
 				await exist.save();
 				const options = {
 					expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
@@ -254,6 +257,7 @@ module.exports = {
 				return res
 					.status(200)
 					.cookie('token', token, options)
+					.cookie('expiryDate', expiryDate.toISOString(), options)
 					.send({ data: exist, token: token });
 			}
 		} catch (error) {
@@ -314,43 +318,86 @@ module.exports = {
 	async userLoggedIN(req, res) {
 		try {
 			const findUser_Status = await userModel.findById(req.user._id);
-	
+
 			if (!findUser_Status) {
 				const businessUser = await BusinessUser.findById(req.user._id);
-				
+
 				if (!businessUser) {
 					return res.status(404).send({ message: 'User not found' });
 				}
-	
-				if (businessUser.isLogged) {
-					return res.status(200).send(businessUser);
-				} else {
+
+				if (!businessUser.isLogged) {
 					return res.status(403).send({ message: 'You have to login first!' });
 				}
+
+				return res.status(200).send(businessUser);
 			}
-	
+
 			if (!findUser_Status.isLogged) {
 				return res.status(403).send({ message: 'You have to login first!' });
 			}
-	
-			if (findUser_Status?.payment?.membership && findUser_Status?.payment?.membership_expiry) {
-				const now = new Date();
+
+			const now = new Date();
+			const expiryDate = new Date(findUser_Status.sessionExpiry);
+			const bufferTime = 5 * 60 * 1000;
+
+			if (now - expiryDate > bufferTime) {
+				findUser_Status.isLogged = false;
+				findUser_Status.sessionExpiry = null;
+				await findUser_Status.save();
+
+				return res
+					.status(403)
+					.clearCookie('token', {
+						httpOnly: true,
+						sameSite: 'none',
+						secure: true,
+					})
+					.clearCookie('expiryDate', {
+						httpOnly: true,
+						sameSite: 'none',
+						secure: true,
+					})
+					.send({ message: 'Session expired, please login again' });
+			}
+
+			const newExpiryDate = new Date(Date.now() + 60 * 60 * 1000);
+			findUser_Status.sessionExpiry = newExpiryDate;
+
+			if (
+				findUser_Status?.payment?.membership &&
+				findUser_Status?.payment?.membership_expiry
+			) {
 				const expiryDate = new Date(findUser_Status.payment.membership_expiry);
-	
+
 				if (expiryDate < now) {
 					findUser_Status.payment = {
 						membership: false,
-						membership_pause: false
+						membership_pause: false,
 					};
 					await findUser_Status.save();
 					return res.status(200).send(findUser_Status);
 				}
 			}
-	
-			return res.status(200).send(findUser_Status);
+
+			await findUser_Status.save();
+
+			const options = {
+				expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+				httpOnly: true,
+				sameSite: 'none',
+				secure: true,
+			};
+
+			return res
+				.status(200)
+				.cookie('expiryDate', newExpiryDate.toISOString(), options)
+				.send(findUser_Status);
 		} catch (err) {
-			console.error("Error in userLoggedIN:", err);
-			return res.status(500).send({ message: "Internal Server Error", error: err });
+			console.error('Error in userLoggedIN:', err);
+			return res
+				.status(500)
+				.send({ message: 'Internal Server Error', error: err });
 		}
 	},
 

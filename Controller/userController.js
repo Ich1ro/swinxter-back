@@ -2396,42 +2396,47 @@ module.exports = {
 	async verifyUserAccount(req, res) {
 		const { id } = req.params;
 		const { data, verifiedPerson } = req.body;
-
+	
 		try {
 			const user = await userModel.findById(id);
 			if (!user) {
 				return res.status(404).send({ message: 'User not found' });
 			}
-
+	
 			let verificationRecord;
 			if (!user?.verificationId) {
 				verificationRecord = new verification({
 					userId: user._id,
-					verification_result: [data],
+					verification_result: [],
 				});
 				await verificationRecord.save();
 				user.verificationId = verificationRecord._id;
 			} else {
 				verificationRecord = await verification.findById(user.verificationId);
-				if (verificationRecord) {
-					verificationRecord.verification_result.push(data);
-					await verificationRecord.save();
-				}
 			}
-
+	
+			const isAlreadyVerified = verificationRecord.verification_result.some(entry => 
+				entry.firstName === data.firstName && entry.lastName === data.lastName
+			);
+	
+			if (!isAlreadyVerified) {
+				verificationRecord.verification_result.push(data);
+				await verificationRecord.save();
+			}
+	
 			if (user.profile_type === 'couple' && verifiedPerson) {
-				if (verifiedPerson === 'person1') {
+				if (verifiedPerson === 'person1' && !isAlreadyVerified) {
 					user.couple.person1.isVerify = true;
-				} else if (verifiedPerson === 'person2') {
+				} else if (verifiedPerson === 'person2' && !isAlreadyVerified) {
 					user.couple.person2.isVerify = true;
 				}
 			}
-
+	
 			await user.save();
-
+	
 			const updatedUsers = await userModel.find();
-
-			res.status(200).send(updatedUsers);
+	
+			res.status(200).send(isAlreadyVerified);
 		} catch (error) {
 			console.error('Error updating user:', error);
 			res.status(500).send({ message: 'Internal server error' });

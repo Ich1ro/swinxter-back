@@ -314,21 +314,28 @@ module.exports = {
 	async userLoggedIN(req, res) {
 		try {
 			const findUser_Status = await userModel.findById(req.user._id);
+	
 			if (!findUser_Status) {
 				const businessUser = await BusinessUser.findById(req.user._id);
+				
+				if (!businessUser) {
+					return res.status(404).send({ message: 'User not found' });
+				}
+	
 				if (businessUser.isLogged) {
 					return res.status(200).send(businessUser);
 				} else {
 					return res.status(403).send({ message: 'You have to login first!' });
 				}
 			}
-			if (findUser_Status.isLogged) {
-				return res.status(200).send(findUser_Status);
+	
+			if (!findUser_Status.isLogged) {
+				return res.status(403).send({ message: 'You have to login first!' });
 			}
-
-			if (findUser_Status?.payment && findUser_Status?.payment?.membership && findUser_Status?.payment?.membership_expiry) {
+	
+			if (findUser_Status?.payment?.membership && findUser_Status?.payment?.membership_expiry) {
 				const now = new Date();
-				const expiryDate = new Date(findUser_Status?.payment?.membership_expiry);
+				const expiryDate = new Date(findUser_Status.payment.membership_expiry);
 	
 				if (expiryDate < now) {
 					findUser_Status.payment = {
@@ -336,11 +343,14 @@ module.exports = {
 						membership_pause: false
 					};
 					await findUser_Status.save();
+					return res.status(200).send(findUser_Status);
 				}
 			}
+	
+			return res.status(200).send(findUser_Status);
 		} catch (err) {
-			console.log(err, 'NOW');
-			return res.status(500).send(err);
+			console.error("Error in userLoggedIN:", err);
+			return res.status(500).send({ message: "Internal Server Error", error: err });
 		}
 	},
 

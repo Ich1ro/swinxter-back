@@ -57,6 +57,7 @@ const io = require('socket.io')(server, {
 		origin: [
 			'http://localhost:3000',
 			'http://localhost:3001',
+			'http://localhost:5173',
 			'https://swinxter-v2.vercel.app',
 			'https://swinxter-admin.vercel.app',
 			'https://www.swinxter.com',
